@@ -8,8 +8,9 @@ I use **UTM** to run a NixOS VM. The following steps will guide you through sett
 
 ### 1. Prerequisites on macOS
 
-1. Install **UTM** from [https://mac.getutm.app](https://mac.getutm.app)
-2. Download the **NixOS minimal ISO** from [https://nixos.org/download/](https://nixos.org/download/) (choose ARM64 for Apple Silicon compatibility)
+1. Install **UTM** from [https://mac.getutm.app](https://mac.getutm.app).
+2. Install **just** from brew : `brew install just`.
+3. Download the **NixOS minimal ISO** from [https://nixos.org/download/](https://nixos.org/download/) (choose ARM64 for Apple Silicon compatibility)
 
 ---
 
@@ -32,13 +33,13 @@ I use **UTM** to run a NixOS VM. The following steps will guide you through sett
 
 #### Semi-automatic setup
 
-1. Run `passwd` and add a dummy password.
+1. Run `passwd` and add a dummy password inside the VM.
 2. Get the local IP of the VM using `hostname -I`.
-3. Run `bash install-in-vm.sh <VM_IP>`.
+3. Run `just setup-vm <VM_IP>` on the MacOS host machine.
 
 #### Manuel setup
 
-1. Run `passwd` and add a dummy password.
+1. Run `passwd` and add a dummy password inside the VM.
 2. Get the local IP of the VM using `hostname -I`.
 3. Use `ssh -o StrictHostKeychecking=no nixos@<VM_IP>` to SSH into the VM for simplicity.
 4. Run `sudo su` so we can partition and format the visrtual disk.

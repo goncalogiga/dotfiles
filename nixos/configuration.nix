@@ -34,15 +34,8 @@
     services.xserver.displayManager.gdm.enable = true;
     services.xserver.desktopManager.gnome.enable = true;
 
-    # X11 + Wayland
-    services.xserver.displayManager.gdm.enable = true;
-    services.xserver.desktopManager.gnome.enable = true;
-
     # GPU acceleration
     hardware.opengl.enable = true;
-
-    # Wayland
-    services.xserver.windowManager.enable = false; # GNOME uses Wayland by default
 
     # Sound
     sound.enable = true;
