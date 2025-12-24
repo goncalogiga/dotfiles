@@ -9,58 +9,47 @@ I use **UTM** to run a NixOS VM. The following steps will guide you through sett
 ### 1. Prerequisites on macOS
 
 1. Install **UTM** from [https://mac.getutm.app](https://mac.getutm.app)
-2. Optionally install `qemu` if you want to manipulate disk images:
-   ```bash
-   brew install qemu
-   ```
-3. Download the **NixOS graphical ISO** for your architecture:
-   - Apple Silicon → ARM64
-   - Intel → x86_64
-   [Download here](https://nixos.org/download.html)
+2. Download the **NixOS minimal ISO** from [https://nixos.org/download/](https://nixos.org/download/) (choose ARM64 for Apple Silicon compatibility)
 
 ---
 
 ### 2. Create a new VM in UTM
 
-1. Open UTM → **+ New VM** → Virtualize → Linux → select architecture
-2. Attach the **NixOS ISO** you downloaded
-3. Allocate **CPU & Memory**
+1. Open UTM → **+ New VM** → Virtualize → Linux
+2. Allocate **CPU & Memory**
+3. Select **boot ISO image** and choose the downloaded NixOS iso file
 4. Add **storage**
-5. Configure **display** → SPICE/virtio + GPU acceleration
-6. Configure **networking** → Shared Network or Bridged
-7. Finish and boot the VM
+5. Setup shared directory (TODO)
+6. Rename the VM (optional but cool)
+7. Boot the VM
+8. Select the GNOME Linux LTS installer
+
+> Personnal note : VM with 8192MiB memory, 8 CPU cores, 64GB storage does the job.
 
 ---
 
-### 3. Install NixOS inside the VM
+### 3. Setup NixOS inside the VM
 
-1. Open the terminal in the live ISO
-2. Partition and format your disk:
-   ```bash
-   parted /dev/vda mklabel gpt
-   parted /dev/vda mkpart primary 512MiB 100%
-   parted /dev/vda set 1 boot on
-   mkfs.ext4 /dev/vda1
-   mount /dev/vda1 /mnt
-   ```
-3. Generate a default NixOS configuration:
-   ```bash
-   nixos-generate-config --root /mnt
-   ```
-4. Clone this dotfiles repository into the VM:
-   ```bash
-   git clone https://github.com/goncalogiga/dotfiles.git /mnt/root/dotfiles
-   ```
-5. Replace the generated configuration with your flake-based config:
-   ```bash
-   mv /mnt/etc/nixos/configuration.nix /mnt/etc/nixos/configuration.nix.backup
-   ln -s /mnt/root/dotfiles/nixos/configuration.nix /mnt/etc/nixos/configuration.nix
-   ```
-6. Install NixOS:
-   ```bash
-   nixos-install
-   reboot
-   ```
+#### Semi-automatic setup
+
+1. Run `passwd` and add a dummy password.
+2. Get the local IP of the VM using `hostname -I`.
+3. Use `scp -o StrictHostKeychecking=no install-nixos.sh nixos@<VM_IP>:/home/nixos/` to send the NixOS installer to the VM.
+4. SSH into the VM with `ssh -o StrictHostKeychecking=no nixos@<VM_IP>`.
+5. Run `bash install-nixos.sh uefi`.
+
+#### Manuel setup
+
+1. Run `passwd` and add a dummy password.
+2. Get the local IP of the VM using `hostname -I`.
+3. Use `ssh -o StrictHostKeychecking=no nixos@<VM_IP>` to SSH into the VM for simplicity.
+4. Run `sudo su` so we can partition and format the visrtual disk.
+5. Partition the disk according to the [Nix documentation](https://nixos.org/manual/nixos/stable/#sec-installation-manual-partitioning-UEFI) (Note that disk will likely be `/dev/vda` and not `/dev/sda`.)
+6. Format the disk according to the [Nix documentation](https://nixos.org/manual/nixos/stable/#sec-installation-manual-partitioning-formatting) (Note that disk will likely be `/dev/vda*` and not `/dev/sda*`.)
+7. Mount and generate an initial config according to the [Nix documentation](https://nixos.org/manual/nixos/stable/#sec-installation-manual-partitioning-formatting) (Note that swapn will likely target `/dev/vda2` and not `/dev/sda2`.)
+8. We can now git clone our NixOS configuration : `git clone https://github.com/goncalogiga/dotfiles.git /mnt/root/dotfiles`.
+9. Replace the generated config with ours : `mv /mnt/etc/nixos/configuration.nix /mnt/etc/nixos/configuration.nix.backup && ln -s /mnt/root/dotfiles/nixos/configuration.nix /mnt/etc/nixos/configuration.nix`.
+10. Install NixOS and reboot : `nixos-install && reboot`
 
 ---
 
