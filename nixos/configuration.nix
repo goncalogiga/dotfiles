@@ -34,11 +34,12 @@
     services.xserver.displayManager.gdm.enable = true;
     services.xserver.desktopManager.gnome.enable = true;
 
+    # X11 + Wayland
+    services.xserver.displayManager.gdm.enable = true;
+    services.xserver.desktopManager.gnome.enable = true;
+
     # GPU acceleration
     hardware.opengl.enable = true;
-
-    # SPICE clipboard integration (copy/paste between host and VM)
-    services.spice-vdagent.enable = true;
 
     # Wayland
     services.xserver.windowManager.enable = false; # GNOME uses Wayland by default

@@ -34,9 +34,7 @@ I use **UTM** to run a NixOS VM. The following steps will guide you through sett
 
 1. Run `passwd` and add a dummy password.
 2. Get the local IP of the VM using `hostname -I`.
-3. Use `scp -o StrictHostKeychecking=no install-nixos.sh nixos@<VM_IP>:/home/nixos/` to send the NixOS installer to the VM.
-4. SSH into the VM with `ssh -o StrictHostKeychecking=no nixos@<VM_IP>`.
-5. Run `bash install-nixos.sh uefi`.
+3. Run `bash install-in-vm.sh <VM_IP>`.
 
 #### Manuel setup
 
@@ -48,7 +46,7 @@ I use **UTM** to run a NixOS VM. The following steps will guide you through sett
 6. Format the disk according to the [Nix documentation](https://nixos.org/manual/nixos/stable/#sec-installation-manual-partitioning-formatting) (Note that disk will likely be `/dev/vda*` and not `/dev/sda*`.)
 7. Mount and generate an initial config according to the [Nix documentation](https://nixos.org/manual/nixos/stable/#sec-installation-manual-partitioning-formatting) (Note that swapn will likely target `/dev/vda2` and not `/dev/sda2`.)
 8. We can now git clone our NixOS configuration : `git clone https://github.com/goncalogiga/dotfiles.git /mnt/root/dotfiles`.
-9. Replace the generated config with ours : `mv /mnt/etc/nixos/configuration.nix /mnt/etc/nixos/configuration.nix.backup && ln -s /mnt/root/dotfiles/nixos/configuration.nix /mnt/etc/nixos/configuration.nix`.
+9. Replace the generated config with ours : `cp /mnt/root/dotfiles/flake.nix /mnt/etc/nixos/flake.nix && cp -r /mnt/root/dotfiles/nixos" /mnt/etc/nixos/`.
 10. Install NixOS and reboot : `nixos-install && reboot`
 
 ---
