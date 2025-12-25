@@ -1,24 +1,50 @@
 {
-  description = "NixOS UTM dev VM";
+  description = "NixOS systems and tools";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Stable NixOS
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+
+    # Unstable channel for selected packages
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+
+    # Bleeding edge (use with care)
+    nixpkgs-master.url = "github:nixos/nixpkgs";
+
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs = inputs@{ self, nixpkgs, home-manager, ... }:
     let
-      system = "aarch64-linux"; # Apple Silicon
-    in {
-      nixosConfigurations.vm = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [
-          ./nixos/configuration.nix
-          home-manager.nixosModules.home-manager
-        ];
+      inherit (self) outputs;
+      inherit (nixpkgs.lib) nixosSystem;
+      specialArgs = { inherit inputs outputs; };
+    in
+    {
+      overlays = import ./nix/overlays { inherit inputs; };
+
+      nixosConfigurations = {
+        vm = nixosSystem {
+          specialArgs = specialArgs;
+
+          modules = [
+            home-manager.nixosModules.home-manager
+
+            {
+              home-manager.users.goncalo =
+                import ./nix/home/goncalo;
+
+              home-manager.extraSpecialArgs = specialArgs;
+            }
+
+            ./nix/system/vm
+          ];
+        };
       };
     };
 }
