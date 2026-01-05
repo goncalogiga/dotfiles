@@ -1,6 +1,6 @@
 # dotfiles
 
-This repository contains my NixOS + Home Manager configuration
+This repository contains my NixOS + Home Manager configuration.
 
 ## Setting up the NixOS VM on macOS
 
