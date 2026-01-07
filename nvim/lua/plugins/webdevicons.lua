@@ -1,6 +1,6 @@
 return {
   "nvim-tree/nvim-web-devicons",
-  lazy = true,
+  lazy = false,
   config = function()
     require("nvim-web-devicons").setup({
       default = true,

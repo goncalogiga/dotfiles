@@ -19,4 +19,6 @@ return {
       theme = "dashboard",
     })
   end,
+
+  lazy = false,
 }

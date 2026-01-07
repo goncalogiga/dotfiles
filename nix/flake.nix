@@ -34,9 +34,8 @@
             fd
             tree
 
-            # Editor & terminal
+            # Editor
             neovim
-            kitty
             nodejs # Required by neovim
 
             # Dev tools

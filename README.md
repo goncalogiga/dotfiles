@@ -17,14 +17,15 @@ I use **UTM** to run a Ubuntu VM. The following steps will guide you through set
 
 1. Open UTM → **+ New VM** → Virtualize → Linux
 2. Allocate **CPU & Memory**
-3. Check the `Use Apple Virtualization` box
-4. Select **boot ISO image** and choose the downloaded Ubuntu ISO file
-5. Add **storage**
-6. Setup shared directory (TODO)
-7. Rename the VM
-8. Boot the VM
-9. Select the `Try or Install Ubuntu` line.
-10. Follow the installer guide and install Ubuntu on the VM.
+3. Check the `Enable hardware OpenGL acceleration` box.
+4. Check the `Use Apple Virtualization` box
+5. Select **boot ISO image** and choose the downloaded Ubuntu ISO file
+6. Add **storage**
+7. Setup shared directory (TODO)
+8. Rename the VM
+9. Boot the VM
+10. Select the `Try or Install Ubuntu` line.
+11. Follow the installer guide and install Ubuntu on the VM.
 
 > Personnal note : VM with 8192MiB memory, default CPU cores, 64GB storage does the job.
 

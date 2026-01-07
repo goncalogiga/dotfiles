@@ -15,7 +15,8 @@ if command -v apt >/dev/null; then
     curl \
     git \
     ca-certificates \
-    xz-utils
+    xz-utils \
+    kitty
 fi
 
 # --------------------------------------
