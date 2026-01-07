@@ -5,3 +5,4 @@ vim.g.maplocalleader = ","
 
 require("goncalo")
 require("plugins")
+require("config")

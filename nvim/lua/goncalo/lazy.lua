@@ -15,13 +15,13 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup("plugins", {
     defaults = {
-        lazy = true, -- EVERYTHING lazy-loaded by default
+        lazy = true,
     },
     install = {
         missing = true,
         colorscheme = { "catppuccin" },
     },
     checker = {
-        enabled = false, -- reproducibility > auto-updates
+        enabled = false,
     },
 })
