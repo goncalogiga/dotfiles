@@ -25,7 +25,7 @@
           name = "vm-dev-shell";
 
           packages = with pkgs; [
-            # Core
+            # Core utilities
             git
             curl
             wget
@@ -36,12 +36,12 @@
 
             # Editor
             neovim
-            nodejs # Required by neovim
+            nodejs   # needed by neovim plugins
+            lazygit
 
             # Dev tools
             python3
             python3Packages.pip
-            nodejs
             docker
             docker-compose
 
@@ -52,8 +52,10 @@
           ];
 
           shellHook = ''
-            export EDITOR=nvim
-            echo "🚀 Nix dev environment loaded for ${system}"
+            # Idempotent environment setup
+            if [ -z "''${EDITOR:-}" ]; then
+              export EDITOR=nvim
+            fi
           '';
         };
       });
