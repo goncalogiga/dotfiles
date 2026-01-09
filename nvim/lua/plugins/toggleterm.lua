@@ -41,11 +41,11 @@ return {
     function _G.set_terminal_keymaps()
       local opts = { buffer = 0 }
       vim.keymap.set("t", "<C-esc>", [[<C-\><C-n>]], opts)
-      vim.keymap.set("t", "<A-p>", [[<Cmd>wincmd h<CR>]], opts)
-      vim.keymap.set("t", "<A-h>", [[<Cmd>wincmd h<CR>]], {})
-      vim.keymap.set("t", "<A-j>", [[<Cmd>wincmd j<CR>]], {})
-      vim.keymap.set("t", "<A-k>", [[<Cmd>wincmd k<CR>]], {})
-      vim.keymap.set("t", "<A-l>", [[<Cmd>wincmd l<CR>]], {})
+      vim.keymap.set("t", "<A-p>", [[<cmd>wincmd h<CR>]], opts)
+      vim.keymap.set("t", "<A-h>", [[<cmd>wincmd h<CR>]], {})
+      vim.keymap.set("t", "<A-j>", [[<cmd>wincmd j<CR>]], {})
+      vim.keymap.set("t", "<A-k>", [[<cmd>wincmd k<CR>]], {})
+      vim.keymap.set("t", "<A-l>", [[<cmd>wincmd l<CR>]], {})
     end
 
     -- Only for toggleterm buffers

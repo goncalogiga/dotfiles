@@ -1,18 +1,18 @@
 return {
-  "nvim-tree/nvim-tree.lua",
-  dependencies = {
+    "nvim-tree/nvim-tree.lua",
+    dependencies = {
     "nvim-tree/nvim-web-devicons",
-  },
+    },
 
-  -- IMPORTANT: disable netrw BEFORE loading the plugin
-  init = function()
+    -- IMPORTANT: disable netrw BEFORE loading the plugin
+    init = function()
     vim.g.loaded_netrw = 1
     vim.g.loaded_netrwPlugin = 1
-  end,
+    end,
 
-  cmd = { "NvimTreeToggle", "NvimTreeOpen", "NvimTreeFocus" },
+    cmd = { "NvimTreeToggle", "NvimTreeOpen", "NvimTreeFocus" },
 
-  config = function()
+    config = function()
     require("nvim-tree").setup({
       sort = {
         sorter = "case_sensitive",
@@ -27,13 +27,7 @@ return {
         dotfiles = true,
       },
     })
-  end,
+    end,
 
-  keys = {
-    {
-      "<leader>e",
-      "<cmd>NvimTreeToggle<CR>",
-      desc = "Toggle file tree",
-    },
-  },
+    lazy=false
 }
