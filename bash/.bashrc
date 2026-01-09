@@ -144,3 +144,6 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# Alias to quickly enter nix common dev env
+alias dev="nix develop $HOME/dotfiles/nix"

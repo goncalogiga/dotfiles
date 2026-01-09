@@ -3,64 +3,64 @@ set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-echo "📁 Dotfiles directory: $DOTFILES_DIR"
-
-# --------------------------------------
-# 1. System prerequisites
-# --------------------------------------
+# System packages
 if command -v apt >/dev/null; then
-  echo "📦 Installing system dependencies"
   sudo apt update
   sudo apt install -y \
     curl \
     git \
     ca-certificates \
     xz-utils \
-    kitty
+    kitty \
+    fontconfig
 fi
 
-# --------------------------------------
-# 2. Install Nix (if missing)
-# --------------------------------------
+# Install JetBrains Mono Nerd Font (system-wide)
+FONT_DIR="/usr/local/share/fonts/JetBrainsMonoNerdFont"
+
+if [ ! -d "$FONT_DIR" ]; then
+  sudo mkdir -p "$FONT_DIR"
+  curl -L https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip \
+    -o /tmp/JetBrainsMono.zip
+  sudo unzip /tmp/JetBrainsMono.zip -d "$FONT_DIR"
+  sudo fc-cache -fv
+fi
+
+# Install Nix
 if ! command -v nix >/dev/null; then
-  echo "❄️ Installing Nix"
   sh <(curl -L https://nixos.org/nix/install) --daemon
-else
-  echo "✅ Nix already installed"
 fi
 
-# Load nix into current shell
+# Load nix
 if [ -e /etc/profile.d/nix.sh ]; then
   . /etc/profile.d/nix.sh
 fi
 
-# --------------------------------------
-# 3. Enable flakes
-# --------------------------------------
+# Enable flakes
 NIX_CONF="$HOME/.config/nix/nix.conf"
 mkdir -p "$(dirname "$NIX_CONF")"
 
-if ! grep -q flakes "$NIX_CONF" 2>/dev/null; then
-  echo "⚙️ Enabling nix flakes"
-  cat >>"$NIX_CONF" <<EOF
-experimental-features = nix-command flakes
-EOF
+if ! grep -q "flakes" "$NIX_CONF" 2>/dev/null; then
+  echo "experimental-features = nix-command flakes" >>"$NIX_CONF"
 fi
 
-# --------------------------------------
-# 4. Link dotfiles
-# --------------------------------------
-echo "🔗 Linking dotfiles"
-
+# Link dotfiles
 mkdir -p "$HOME/.config"
 
-ln -sf "$DOTFILES_DIR/nvim"   "$HOME/.config/nvim"
-ln -sf "$DOTFILES_DIR/kitty"  "$HOME/.config/kitty"
+ln -sf "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
+ln -sf "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
 ln -sf "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
 
-# --------------------------------------
-# 5. Enter dev environment
-# --------------------------------------
-echo "🚀 Entering Nix dev shell"
-cd "$DOTFILES_DIR/nix"
-nix develop
+# Setup linux preferences
+bash linux/ubuntu_preferences.sh
+
+# Final notice
+cat <<'EOF'
+
+Installation complete.
+
+Important:
+- Fully close and reopen your terminal for font changes to take effect.
+- Run `dev` to enter the nix common development environment.
+
+EOF
