@@ -1,10 +1,4 @@
 -- =====================================
--- LSP-ZERO v4+
--- =====================================
-
-local lsp = require("lsp-zero")
-
--- =====================================
 -- Mason
 -- =====================================
 
@@ -12,21 +6,24 @@ require("mason").setup()
 
 require("mason-lspconfig").setup({
   ensure_installed = {
-    "pyright",
-    "rust_analyzer",
     "lua_ls",
+    "pyright",
     "ruff",
+    "rust_analyzer",
   },
+  automatic_installation = true,
 })
 
 -- =====================================
--- LSP servers
+-- LSP (Neovim 0.11 native API)
 -- =====================================
 
-local lspconfig = require("lspconfig")
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
 -- Lua
-lspconfig.lua_ls.setup({
+vim.lsp.config("lua_ls", {
+  capabilities = capabilities,
   settings = {
     Lua = {
       diagnostics = {
@@ -35,53 +32,76 @@ lspconfig.lua_ls.setup({
       workspace = {
         checkThirdParty = false,
       },
+      telemetry = {
+        enable = false,
+      },
     },
   },
 })
 
 -- Python
-lspconfig.pyright.setup({})
-lspconfig.ruff.setup({})
+vim.lsp.config("pyright", {
+  capabilities = capabilities,
+})
+
+vim.lsp.config("ruff", {
+  capabilities = capabilities,
+})
 
 -- Rust
-lspconfig.rust_analyzer.setup({})
+vim.lsp.config("rust_analyzer", {
+  capabilities = capabilities,
+})
 
 -- =====================================
 -- nvim-cmp
 -- =====================================
 
 local cmp = require("cmp")
+local luasnip = require("luasnip")
 
 require("luasnip.loaders.from_vscode").lazy_load()
 
 cmp.setup({
-  mapping = {
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body)
+    end,
+  },
+  mapping = cmp.mapping.preset.insert({
     ["<Tab>"] = cmp.mapping.select_next_item(),
     ["<S-Tab>"] = cmp.mapping.select_prev_item(),
     ["<CR>"] = cmp.mapping.confirm({ select = true }),
     ["<C-Space>"] = cmp.mapping.complete(),
-  },
+  }),
   sources = {
     { name = "nvim_lsp" },
+    { name = "luasnip" },
     { name = "path" },
     { name = "buffer", keyword_length = 3 },
-    { name = "luasnip", keyword_length = 2 },
   },
 })
 
 -- =====================================
--- Keymaps
+-- LSP keymaps
 -- =====================================
 
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(event)
-    local opts = { buffer = event.buf }
+    local opts = { buffer = event.buf, silent = true }
 
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+    vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
-    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
-    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
+    vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+
+    vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
+    vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+    vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
   end,
 })
 
