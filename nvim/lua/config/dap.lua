@@ -1,85 +1,85 @@
-local dap = require("dap")
-local dapui = require("dapui")
-
--- -----------------------
--- Python setup
--- -----------------------
-require("dap-python").setup("python")
-
--- -----------------------
--- Lite DAP UI setup
--- -----------------------
-dapui.setup({
-  layouts = {
-    {
-      elements = {
-        { id = "scopes", size = 0.7 },
-        { id = "repl", size = 0.3 },
-      },
-      size = 15,
-      position = "bottom",
-    },
-  },
-  floating = {
-    border = "rounded",
-    mappings = { close = { "q", "<Esc>" } },
-  },
-  controls = { enabled = false },
-})
-
--- -----------------------
--- Notifications
--- -----------------------
-dap.listeners.after.event_initialized["notify"] = function()
-  require("notify")("✅ Debugger attached successfully!", "info", {
-    title = "nvim-dap",
-  })
-end
-
-dap.listeners.before.event_terminated["notify"] = function()
-  require("notify")("🛑 Debugger terminated.", "warn", {
-    title = "nvim-dap",
-  })
-end
-
-dap.listeners.before.event_exited["notify"] = function()
-  require("notify")("🚪 Debugger session ended.", "info", {
-    title = "nvim-dap",
-  })
-end
-
--- -----------------------
--- Auto open/close UI
--- -----------------------
-dap.listeners.after.event_initialized["dapui_config"] = function()
-  dapui.open()
-end
-
-dap.listeners.before.event_terminated["dapui_config"] = function()
-  dapui.close()
-end
-
-dap.listeners.before.event_exited["dapui_config"] = function()
-  dapui.close()
-end
-
--- -----------------------
--- Python attach config
--- -----------------------
-dap.configurations.python = {
-  {
-    type = "python",
-    request = "attach",
-    name = "Attach to debugpy in Docker",
-    connect = {
-      host = "127.0.0.1",
-      port = 5678,
-    },
-    pathMappings = {
-      {
-        localRoot = vim.fn.getcwd() .. "/src",
-        remoteRoot = "/corneille/src",
-      },
-    },
-  },
-}
+-- local dap = require("dap")
+-- local dapui = require("dapui")
+--
+-- -- -----------------------
+-- -- Python setup
+-- -- -----------------------
+-- require("dap-python").setup("python")
+--
+-- -- -----------------------
+-- -- Lite DAP UI setup
+-- -- -----------------------
+-- dapui.setup({
+--   layouts = {
+--     {
+--       elements = {
+--         { id = "scopes", size = 0.7 },
+--         { id = "repl", size = 0.3 },
+--       },
+--       size = 15,
+--       position = "bottom",
+--     },
+--   },
+--   floating = {
+--     border = "rounded",
+--     mappings = { close = { "q", "<Esc>" } },
+--   },
+--   controls = { enabled = false },
+-- })
+--
+-- -- -----------------------
+-- -- Notifications
+-- -- -----------------------
+-- dap.listeners.after.event_initialized["notify"] = function()
+--   require("notify")("✅ Debugger attached successfully!", "info", {
+--     title = "nvim-dap",
+--   })
+-- end
+--
+-- dap.listeners.before.event_terminated["notify"] = function()
+--   require("notify")("🛑 Debugger terminated.", "warn", {
+--     title = "nvim-dap",
+--   })
+-- end
+--
+-- dap.listeners.before.event_exited["notify"] = function()
+--   require("notify")("🚪 Debugger session ended.", "info", {
+--     title = "nvim-dap",
+--   })
+-- end
+--
+-- -- -----------------------
+-- -- Auto open/close UI
+-- -- -----------------------
+-- dap.listeners.after.event_initialized["dapui_config"] = function()
+--   dapui.open()
+-- end
+--
+-- dap.listeners.before.event_terminated["dapui_config"] = function()
+--   dapui.close()
+-- end
+--
+-- dap.listeners.before.event_exited["dapui_config"] = function()
+--   dapui.close()
+-- end
+--
+-- -- -----------------------
+-- -- Python attach config
+-- -- -----------------------
+-- dap.configurations.python = {
+--   {
+--     type = "python",
+--     request = "attach",
+--     name = "Attach to debugpy in Docker",
+--     connect = {
+--       host = "127.0.0.1",
+--       port = 5678,
+--     },
+--     pathMappings = {
+--       {
+--         localRoot = vim.fn.getcwd() .. "/src",
+--         remoteRoot = "/corneille/src",
+--       },
+--     },
+--   },
+-- }

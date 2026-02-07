@@ -3,6 +3,8 @@ vim.g.mapleader = " "
 
 vim.g.maplocalleader = "," 
 
-require("goncalo")
-require("plugins")
-require("config")
+require("goncalo.set")
+require("goncalo.remap")
+require("goncalo.lazy")   -- sets up lazy.nvim
+require("plugins")        -- plugin specs
+require("config")         -- plugin configuration

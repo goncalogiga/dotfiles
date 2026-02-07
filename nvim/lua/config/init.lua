@@ -1,0 +1,8 @@
+require("config.barbar")
+require("config.black")
+require("config.commentary")
+require("config.dap")
+require("config.fugitive")
+require("config.tagbar")
+require("config.telescope")
+require("config.vscode-diff")
