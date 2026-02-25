@@ -147,3 +147,11 @@ esac
 
 # Alias to quickly enter nix common dev env
 alias dev="nix develop $HOME/dotfiles/nix"
+
+# Python stuff
+alias cvenv="uv venv"
+alias svenv="source .venv/bin/activate"
+alias dvenv="rm -rf .venv/"
+
+# Nix quick access
+try() { nix run "nixpkgs#$1" ;}

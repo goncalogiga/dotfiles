@@ -39,9 +39,18 @@
             nodejs   # needed by neovim plugins
             lazygit
 
+            # Window management
+            tmux
+
             # Dev tools
             python3
+            uv
+            poetry
+            pyright
             python3Packages.pip
+            python3Packages.black
+            python3Packages.isort
+            python3Packages.pynvim
             docker
             docker-compose
 
