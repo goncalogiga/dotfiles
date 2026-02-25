@@ -51,8 +51,6 @@
             python3Packages.pip
             python3Packages.black
             python3Packages.isort
-            docker
-            docker-compose
 
             # Other stuff
             cargo

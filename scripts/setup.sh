@@ -65,6 +65,9 @@ ln -sf "$SECRETS_DIR/ssh/id_ed25519" "$HOME/.ssh/id_ed25519"
 ln -sf "$SECRETS_DIR/ssh/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
 ln -sf "$SECRETS_DIR/ssh/known_hosts" "$HOME/.ssh/known_hosts"
 
+# Install and setup docker
+bash scripts/docker.sh
+
 # Final notice
 cat <<'EOF'
 
@@ -73,5 +76,6 @@ Installation complete.
 Important:
 - Fully close and reopen your terminal for font changes to take effect.
 - Run `dev` to enter the nix common development environment.
+- In order for docker to be fully functionnal, you must restart the VM.
 
 EOF
