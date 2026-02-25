@@ -3,17 +3,22 @@ set shell := ["bash", "-cu"]
 default:
     just --list
 
-install:
-    @echo "🛠️ Installing full VM environment"
-    bash scripts/install.sh
+# Setup the dev environment
+setup:
+    bash scripts/setup.sh
 
-nix-shell:
+# Activate the dev environment
+dev:
     cd nix && nix develop
 
+# Update the nix flake
 update:
     nix flake update
 
-doctor:
-    nix --version
-    which nvim
-    which kitty
+# Encrypt secrets
+encrypt:
+    bash scripts/secrets.sh encrypt secrets/
+
+# Decrypt secrets
+decrypt:
+    bash scripts/secrets.sh decrypt secrets/

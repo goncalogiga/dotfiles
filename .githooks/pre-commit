@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Get staged files inside secrets/
+FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '^secrets/')
+
+if [ -z "$FILES" ]; then
+    exit 0
+fi
+
+INVALID=$(echo "$FILES" | grep -v '\.gpg$')
+
+if [ -n "$INVALID" ]; then
+    echo "ERROR: The following files in secrets/ are not encrypted (.gpg):"
+    echo "$INVALID"
+    exit 1
+fi
+
+exit 0

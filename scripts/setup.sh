@@ -2,6 +2,7 @@
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SECRETS_DIR="$DOTFILES_DIR/decrypted/"
 
 # System packages
 if command -v apt >/dev/null; then
@@ -11,7 +12,6 @@ if command -v apt >/dev/null; then
     git \
     ca-certificates \
     xz-utils \
-    kitty \
     fontconfig
 fi
 
@@ -53,6 +53,17 @@ ln -sf "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
 
 # Setup linux preferences
 bash linux/ubuntu_preferences.sh
+
+# Decrypt secrets
+just decrypt
+
+# Correctly setup encryption checks (pre-commit hooks)
+git config core.hooksPath .githooks
+
+# Link ssh 
+ln -sf "$SECRETS_DIR/ssh/id_ed25519" "$HOME/.ssh/id_ed25519"
+ln -sf "$SECRETS_DIR/ssh/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
+ln -sf "$SECRETS_DIR/ssh/known_hosts" "$HOME/.ssh/known_hosts"
 
 # Final notice
 cat <<'EOF'
