@@ -38,6 +38,7 @@
             neovim
             nodejs   # needed by neovim plugins
             lazygit
+            python3Packages.pynvim
 
             # Window management
             tmux
@@ -50,9 +51,11 @@
             python3Packages.pip
             python3Packages.black
             python3Packages.isort
-            python3Packages.pynvim
             docker
             docker-compose
+
+            # Other stuff
+            cargo
 
             # Build tools
             gcc

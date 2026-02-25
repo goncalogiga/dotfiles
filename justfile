@@ -22,3 +22,7 @@ encrypt:
 # Decrypt secrets
 decrypt:
     bash scripts/secrets.sh decrypt secrets/
+
+# Setup git hooks
+setup-hooks:
+    git config core.hooksPath git/hooks/

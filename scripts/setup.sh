@@ -58,7 +58,7 @@ bash linux/ubuntu_preferences.sh
 just decrypt
 
 # Correctly setup encryption checks (pre-commit hooks)
-git config core.hooksPath .githooks
+just setup-hooks
 
 # Link ssh 
 ln -sf "$SECRETS_DIR/ssh/id_ed25519" "$HOME/.ssh/id_ed25519"

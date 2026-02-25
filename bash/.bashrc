@@ -123,7 +123,7 @@ fi
 export FZF_DEFAULT_COMMAND="fdfind --type d . $HOME"
 
 # Get current git branch in PS1
-source ~/.git-prompt.sh
+source ~/dotfiles/git/git-prompt.sh
 
 # Make PS1 less gigantic
 export PS1='\[\033[01;34m\]$(__git_ps1 "(%.32s)") \[\033[01;32m\]\W\[\033[0m\] \$ '
@@ -132,10 +132,6 @@ export PS1='\[\033[01;34m\]$(__git_ps1 "(%.32s)") \[\033[01;32m\]\W\[\033[0m\] \
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# add `~/bin` to the paths that your shell searches for executables
-export PATH="$PATH:$HOME/bin"
-. "$HOME/.cargo/env"
 
 # pnpm
 export PNPM_HOME="/home/goncalo/.local/share/pnpm"
