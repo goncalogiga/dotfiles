@@ -52,7 +52,7 @@
             python3Packages.black
             python3Packages.isort
 
-            # Other stuff
+            # Rust
             cargo
 
             # Build tools
