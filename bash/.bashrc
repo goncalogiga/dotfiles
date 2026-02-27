@@ -151,3 +151,7 @@ alias dvenv="rm -rf .venv/"
 
 # Nix quick access
 try() { nix run "nixpkgs#$1" ;}
+
+# Desperatly trying to improve kitty performances on the VM
+export MESA_LOADER_DRIVER_OVERRIDE=zink
+export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/virtio_icd.aarch64.json
