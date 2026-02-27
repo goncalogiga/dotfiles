@@ -26,8 +26,6 @@
 
           packages = with pkgs; [
             # Core utilities
-            git
-            curl
             wget
             unzip
             ripgrep
@@ -38,10 +36,8 @@
             neovim
             nodejs   # needed by neovim plugins
             lazygit
+            tree-sitter
             python3Packages.pynvim
-
-            # Window management
-            tmux
 
             # Dev tools
             python3
@@ -59,6 +55,9 @@
             gcc
             gnumake
             pkg-config
+
+            # Terminal
+            btop
           ];
 
           shellHook = ''
