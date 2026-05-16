@@ -7,6 +7,10 @@ default:
 setup:
     bash scripts/setup.sh
 
+# Setup the dev environment for MacOS (no nix here)
+macos-setup:
+    bash scripts/macos-setup.sh
+
 # Activate the dev environment
 dev:
     cd nix && nix develop
