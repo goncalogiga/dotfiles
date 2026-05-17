@@ -48,6 +48,16 @@ if ! command -v node >/dev/null; then
     brew install node
 fi
 
+# Install Karabiner-Elements if missing
+if ! [ -d "/Applications/Karabiner-Elements.app" ]; then
+    brew install --cask karabiner-elements
+fi
+
+# Link Karabiner config
+KARABINER_DIR="$HOME/.config/karabiner/assets/complex_modifications"
+mkdir -p "$KARABINER_DIR"
+ln -sf "$DOTFILES_DIR/karabiner/pc_shortcuts.json" "$KARABINER_DIR/pc_shortcuts.json"
+
 # Link dotfiles
 mkdir -p "$HOME/.config"
 
