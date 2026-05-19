@@ -180,6 +180,27 @@
 				}
 			]
 		},
+        {
+            "description": "Ctrl+Y redo",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "y",
+                        "modifiers": {
+                            "mandatory": ["control"],
+                            "optional": ["any"]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "w", // z in azerty
+                            "modifiers": ["command", "shift"]
+                        }
+                    ]
+                }
+            ]
+        },
 		{
 			"description": "Alt+Tab -> Cmd+Tab",
 			"manipulators": [
@@ -260,6 +281,64 @@
                             ]
                         }
                     ]
+                }
+            ]
+        },
+        {
+            "description": "Ctrl+Space open Spotlight",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "spacebar",
+                        "modifiers": {
+                            "mandatory": ["control"],
+                            "optional": ["any"]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "spacebar",
+                            "modifiers": ["command"]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Ctrl+F fix (force Cmd+F)",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "f",
+                        "modifiers": {
+                            "mandatory": ["control"],
+                            "optional": ["any"]
+                        }
+                    },
+                    "to": [
+                        {
+                            "key_code": "f",
+                            "modifiers": ["command"]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Map ² key to <",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "grave_accent_and_tilde"
+                    },
+                    "to": [
+                        {
+                            "key_code": "non_us_backslash"
+                        }
+			        ]
                 }
             ]
         }
