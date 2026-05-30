@@ -49,16 +49,30 @@ mkdir -p "$HOME/.config"
 
 ln -sf "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
 ln -sf "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
-ln -sf "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
+cp "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
+
+# Export DOTFILES_PATH to bashrc and zshrc
+export_line="export DOTFILES_PATH=\"$DOTFILES_DIR\""
+for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+    if [ -f "$rc" ] && ! grep -qF "DOTFILES_PATH" "$rc"; then
+        echo "$export_line" >> "$rc"
+    fi
+done
 
 # Setup linux preferences
 bash linux/ubuntu_preferences.sh
 
 # Decrypt secrets
-just decrypt
+just decrypt || echo "Warning: 'just decrypt' failed, skipping secrets."
 
 # Correctly setup encryption checks (pre-commit hooks)
 just setup-hooks
+
+# Add python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pyright pynvim black isort
+deactivate
 
 # Link ssh 
 ln -sf "$SECRETS_DIR/ssh/id_ed25519" "$HOME/.ssh/id_ed25519"

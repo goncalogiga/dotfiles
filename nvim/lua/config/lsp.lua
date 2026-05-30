@@ -2,6 +2,10 @@ local cmp = require('cmp')
 local luasnip = require('luasnip')
 require('luasnip.loaders.from_vscode').lazy_load()
 
+-- Python system setup --
+vim.g.python3_host_prog = vim.fn.expand("$DOTFILES_PATH/.venv/bin/python")
+
+
 -- Completion setup --
 cmp.setup({
     snippet = {
@@ -49,11 +53,16 @@ vim.diagnostic.config({
 
 -- Setting up pyright --
 vim.lsp.config('pyright', {
-    cmd = { 'pyright-langserver', '--stdio' },
+    cmd = { 
+        vim.fn.expand("$DOTFILES_PATH/.venv/bin/pyright-langserver"), 
+        '--stdio' 
+    },
     filetypes = { 'python' },
     on_attach = on_attach,
     settings = {
         python = {
+            venvPath = ".",
+            venv = ".venv",
             analysis = {
                 typeCheckingMode = "off",
                 autoSearchPaths = true,

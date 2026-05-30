@@ -38,6 +38,10 @@ if ! command -v fd >/dev/null; then
     brew install fd
 fi
 
+if ! command -v ripgrep >/dev/null; then
+    brew install ripgrep
+fi
+
 # Install uv if missing
 if ! command -v uv >/dev/null; then
     curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -46,6 +50,11 @@ fi
 # Install node and npm if missing
 if ! command -v node >/dev/null; then
     brew install node
+fi
+
+# Install btop if missing
+if ! command -v btop >/dev/null; then
+    brew install btop
 fi
 
 # Install Karabiner-Elements if missing
@@ -65,8 +74,22 @@ ln -sf "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
 ln -sf "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
 
 # Link shell configs
-ln -sf "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
-ln -sf "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
+cp "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+cp "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
+
+# Add python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pyright pynvim black isort
+deactivate
+
+# Export DOTFILES_PATH to bashrc and zshrc
+export_line="export DOTFILES_PATH=\"$DOTFILES_DIR\""
+for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+    if [ -f "$rc" ] && ! grep -qF "DOTFILES_PATH" "$rc"; then
+        echo "$export_line" >> "$rc"
+    fi
+done
 
 # Set zsh as default shell if it isn't already
 if [ "$SHELL" != "$(command -v zsh)" ]; then
