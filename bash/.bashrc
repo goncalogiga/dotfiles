@@ -1,3 +1,10 @@
+# MacOS : add brew bins to PATH
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+export DOTFILES_PATH=/Users/goncalogiga/Work/git/dotfiles
+
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
@@ -87,11 +94,13 @@ fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+# Neovim aliases
+alias n='nvim'
+
 # some more ls aliases
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
-alias n='nvim'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -119,14 +128,15 @@ fi
 
 # For a terminal fuzzy searcher
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
 export FZF_DEFAULT_COMMAND="fdfind --type d . $HOME"
 
-# Get current git branch in PS1
-source ~/dotfiles/git/git-prompt.sh
+# cdf
+#alias cdf='cd $(fd --type d | fzf --height=45%)'
+# Bounded version (if performances matter)
+alias cdf='cd "$(fd --type d --max-depth 5 | fzf --height=45%)"'
 
 # Make PS1 less gigantic
-export PS1='\[\033[01;34m\]$(__git_ps1 "(%.32s)") \[\033[01;32m\]\W\[\033[0m\] \$ '
+export PS1='\[\033[01;34m\]$ \[\033[01;32m\]\W\[\033[0m\] \$ '
 
 # NVM stuff
 export NVM_DIR="$HOME/.nvm"
@@ -151,7 +161,3 @@ alias dvenv="rm -rf .venv/"
 
 # Nix quick access
 try() { nix run "nixpkgs#$1" ;}
-
-# Desperatly trying to improve kitty performances on the VM
-export MESA_LOADER_DRIVER_OVERRIDE=zink
-export VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/virtio_icd.aarch64.json
