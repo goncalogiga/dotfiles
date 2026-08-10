@@ -14,3 +14,8 @@ vim.api.nvim_set_keymap('n', '<leader>fc', ':lua require("telescope").extensions
 local telescope = require("telescope")
 
 telescope.load_extension("live_grep_args")
+
+-- Without this, preview in telescope crashes
+telescope.setup({
+    defaults = { preview = { treesitter = false } },
+})
