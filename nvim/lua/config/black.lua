@@ -1,76 +1,45 @@
-local black_path = vim.fn.expand("$DOTFILES_PATH/.venv/bin/black")
-local isort_path = vim.fn.expand("$DOTFILES_PATH/.venv/bin/isort")
+local bin = vim.fn.expand("$DOTFILES_PATH/.venv/bin/")
 
-local function run_black(filepath, bufnr)
-    local timer = vim.loop.new_timer()
-    local timed_out = false
-    local job_id
+vim.api.nvim_create_autocmd("BufWritePost", {
+    group = vim.api.nvim_create_augroup("PyFormat", { clear = true }),
+    pattern = "*.py",
 
-    timer:start(1000, 0, function()
-        timed_out = true
+    callback = function(args)
+        local buf = args.buf
+        
+        if vim.b[buf].formatting then return end
+
+        local path = vim.api.nvim_buf_get_name(buf)
+        local tick = vim.api.nvim_buf_get_changedtick(buf)
+        local src = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n") .. "\n"
+
+        vim.b[buf].formatting = true
+
+        vim.system({
+          "sh", "-c",
+          ("%sisort -q --profile black --filename %q - | %sblack -q --fast --stdin-filename %q -")
+            :format(bin, path, bin, path),
+        }, { stdin = src, text = true }, function(res)
+
         vim.schedule(function()
-            if job_id then
-                vim.fn.jobstop(job_id)
+            vim.b[buf].formatting = false
+
+            if res.code ~= 0 or res.stdout == "" then
+              return vim.notify("py-format failed: " .. (res.stderr or ""), vim.log.levels.WARN)
             end
-            vim.b[bufnr].black_deferred = true
-            require("notify")("Black took too long — deferring to buffer close.", "error")
+
+            -- bail if the user kept typing while we were formatting
+            if not vim.api.nvim_buf_is_valid(buf) then return end
+            if vim.api.nvim_buf_get_changedtick(buf) ~= tick then return end
+
+            local new = vim.split(res.stdout:gsub("\n$", ""), "\n")
+            if vim.deep_equal(new, vim.api.nvim_buf_get_lines(buf, 0, -1, false)) then return end
+
+            local view = vim.fn.winsaveview()
+            vim.api.nvim_buf_set_lines(buf, 0, -1, false, new)
+            vim.fn.winrestview(view)
+            vim.api.nvim_buf_call(buf, function() vim.cmd("noautocmd silent write") end)
+            end)
         end)
-    end)
-
-    job_id = vim.fn.jobstart({ black_path, filepath }, {
-        stdout_buffered = true,
-        stderr_buffered = true,
-        on_exit = function(_, code, _)
-            timer:stop()
-            timer:close()
-            if timed_out then return end
-            if code == 0 then
-                vim.schedule(function() vim.cmd("edit!") end)
-            else
-                vim.schedule(function()
-                    require("notify")("Black failed to format file.", "error")
-                end)
-            end
-        end,
-    })
-end
-
-local function run_isort_then_black(filepath, bufnr)
-    vim.fn.jobstart({ isort_path, filepath }, {
-        stdout_buffered = true,
-        stderr_buffered = true,
-        on_exit = function(_, code, _)
-            if code ~= 0 then
-                vim.schedule(function()
-                    require("notify")("isort failed.", "error")
-                end)
-            end
-            run_black(filepath, bufnr)
-        end,
-    })
-end
-
-local function setup_black_autocmd()
-    vim.api.nvim_create_autocmd("BufWritePost", {
-        pattern = "*.py",
-        callback = function()
-            local filepath = vim.fn.expand("%")
-            local bufnr = vim.api.nvim_get_current_buf()
-            run_isort_then_black(filepath, bufnr)
-        end,
-    })
-
-    vim.api.nvim_create_autocmd("BufWinLeave", {
-        pattern = "*.py",
-        callback = function()
-            if vim.b.black_deferred then
-                local filepath = vim.fn.expand("%")
-                local bufnr = vim.api.nvim_get_current_buf()
-                run_isort_then_black(filepath, bufnr)
-                vim.b.black_deferred = false
-            end
-        end,
-    })
-end
-
-setup_black_autocmd()
+    end,
+})

@@ -94,8 +94,22 @@ fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# Neovim aliases
-alias n='nvim'
+# Neovim + Python venv
+n() {
+    local venv=""
+    for c in .venv venv; do
+        [[ -f "$c/bin/activate" ]] && { venv="$PWD/$c"; break; }
+    done
+
+    if [[ -z "$venv" ]]; then
+        venv="${XDG_CACHE_HOME:-$HOME/.cache}/nvim-venv"
+        [[ -x "$venv/bin/python" ]] || uv venv "$venv"
+    fi
+
+    source "$venv/bin/activate"
+    "$venv/bin/python" -c 'import pynvim' 2>/dev/null || VIRTUAL_ENV="$venv" uv pip install pynvim
+    nvim "$@"
+}
 
 # some more ls aliases
 alias ll='ls -alF'
@@ -131,9 +145,9 @@ fi
 export FZF_DEFAULT_COMMAND="fdfind --type d . $HOME"
 
 # cdf
-#alias cdf='cd $(fd --type d | fzf --height=45%)'
+#alias cdf='cd $(fd --full-path "Work/" --type d | fzf --height=45%)'
 # Bounded version (if performances matter)
-alias cdf='cd "$(fd --type d --max-depth 5 | fzf --height=45%)"'
+alias cdf='cd "$(fd --full-path "Work/" --type d --max-depth 5 | fzf --height=45%)"'
 
 # Make PS1 less gigantic
 export PS1='\[\033[01;34m\]$ \[\033[01;32m\]\W\[\033[0m\] \$ '
