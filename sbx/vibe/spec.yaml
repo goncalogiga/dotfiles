@@ -1,0 +1,45 @@
+schemaVersion: "2"
+kind: sandbox
+name: vibe
+version: "0.1.0"
+displayName: Mistral Vibe
+description: Mistral Vibe CLI coding agent
+
+sandbox:
+  image: docker/sandbox-templates:shell-docker
+  entrypoint: ["vibe"]
+
+permissions:
+  network:
+    allow:
+      - api.mistral.ai
+      - astral.sh
+      - github.com
+      - objects.githubusercontent.com
+      - pypi.org
+      - files.pythonhosted.org
+
+credentials:
+  - service: mistral
+    description: Mistral API key for Vibe
+    required: true
+    apiKey:
+      name: MISTRAL_API_KEY
+      proxyManaged: true
+      inject:
+        - domain: api.mistral.ai
+          scheme: bearer
+
+setup:
+  install:
+    - description: Install uv
+      user: "0"
+      command: >-
+        curl -LsSf https://astral.sh/uv/install.sh
+        | env UV_INSTALL_DIR=/usr/local/bin sh
+    - description: Install Mistral Vibe
+      user: "0"
+      command: >-
+        UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin
+        uv tool install mistral-vibe
+        && chmod -R a+rX /opt/uv-tools

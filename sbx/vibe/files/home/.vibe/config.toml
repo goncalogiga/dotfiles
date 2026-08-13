@@ -1,0 +1,7 @@
+# Sandbox is disposable; updating in-place wastes time on every create
+enable_auto_update = false
+
+# No desktop session inside the microVM
+enable_notifications = false
+
+enable_telemetry = false

@@ -185,6 +185,9 @@ case ":$PATH:" in
 esac
 # pnpm end
 
+# Docker bin accessible from a bash shell
+[[ -d "$HOME/.docker/bin" ]] && export PATH="$HOME/.docker/bin:$PATH"
+
 # Alias to quickly enter nix common dev env
 alias dev="nix develop $HOME/dotfiles/nix"
 

@@ -59,6 +59,16 @@ if ! command -v gls >/dev/null; then
     brew install coreutils
 fi
 
+# Install Docker Sandboxes (sbx) if missing — Apple silicon only
+if ! command -v sbx >/dev/null; then
+    if [ "$(uname -m)" = "arm64" ]; then
+        brew trust docker/tap
+        brew install docker/tap/sbx
+    else
+        echo "Skipping sbx: requires Apple silicon" >&2
+    fi
+fi
+
 # Install Karabiner-Elements if missing
 if ! [ -d "/Applications/Karabiner-Elements.app" ]; then
     brew install --cask karabiner-elements
