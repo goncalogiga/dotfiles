@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if ! command -v brew >/dev/null; then
@@ -10,7 +9,7 @@ fi
 
 # Install neovim if missing
 if ! command -v nvim >/dev/null; then
-    brew install --HEAD neovim
+    brew install neovim
 fi
 
 # Install kitty if missing
@@ -33,18 +32,16 @@ fi
 if ! command -v fzf >/dev/null; then
     brew install fzf
 fi
-
 if ! command -v fd >/dev/null; then
     brew install fd
 fi
-
 if ! command -v ripgrep >/dev/null; then
     brew install ripgrep
 fi
 
 # Install uv if missing
 if ! command -v uv >/dev/null; then
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    brew install uv
 fi
 
 # Install node and npm if missing
@@ -55,6 +52,11 @@ fi
 # Install btop if missing
 if ! command -v btop >/dev/null; then
     brew install btop
+fi
+
+# Install coreutils if missing (GNU ls/dircolors for linux-matching colours)
+if ! command -v gls >/dev/null; then
+    brew install coreutils
 fi
 
 # Install Karabiner-Elements if missing
@@ -69,7 +71,6 @@ ln -sf "$DOTFILES_DIR/karabiner/pc_shortcuts.json" "$KARABINER_DIR/pc_shortcuts.
 
 # Link dotfiles
 mkdir -p "$HOME/.config"
-
 ln -sf "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
 ln -sf "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
 
@@ -77,11 +78,13 @@ ln -sf "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
 cp "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
 cp "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
 
-# Add python virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
-pip install pyright pynvim black isort
-deactivate
+# Shared neovim python environment
+NVIM_VENV="${XDG_CACHE_HOME:-$HOME/.cache}/nvim-venv"
+uv venv "$NVIM_VENV"
+VIRTUAL_ENV="$NVIM_VENV" uv pip install pynvim black isort
+
+# Python-based CLI tools, installed as isolated executables
+uv tool install pyright
 
 # Export DOTFILES_PATH to bashrc and zshrc
 export_line="export DOTFILES_PATH=\"$DOTFILES_DIR\""
@@ -90,13 +93,3 @@ for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
         echo "$export_line" >> "$rc"
     fi
 done
-
-# Set zsh as default shell if it isn't already
-if [ "$SHELL" != "$(command -v zsh)" ]; then
-    if command -v zsh >/dev/null; then
-        chsh -s "$(command -v zsh)"
-        echo "Default shell set to zsh. Re-login for it to take effect."
-    else
-        echo "zsh not found — install it with: brew install zsh"
-    fi
-fi

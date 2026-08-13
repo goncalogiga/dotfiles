@@ -91,8 +91,11 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+# specific macos color support
+if [[ "$(uname)" == "Darwin" ]] && command -v gls >/dev/null; then
+    alias ls='gls --color=auto --group-directories-first'
+    eval "$(gdircolors -b)"
+fi
 
 # Neovim + Python venv
 n() {
@@ -109,6 +112,23 @@ n() {
     source "$venv/bin/activate"
     "$venv/bin/python" -c 'import pynvim' 2>/dev/null || VIRTUAL_ENV="$venv" uv pip install pynvim
     nvim "$@"
+}
+
+# IPython
+p() {
+    local venv=""
+    for c in .venv venv; do
+        [[ -f "$c/bin/activate" ]] && { venv="$PWD/$c"; break; }
+    done
+
+    if [[ -z "$venv" ]]; then
+        venv="${XDG_CACHE_HOME:-$HOME/.cache}/nvim-venv"
+        [[ -x "$venv/bin/python" ]] || uv venv "$venv"
+    fi
+
+    source "$venv/bin/activate"
+    "$venv/bin/python" -c 'import ipython' 2>/dev/null || VIRTUAL_ENV="$venv" uv pip install ipython
+    ipython
 }
 
 # some more ls aliases
