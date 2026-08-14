@@ -4,7 +4,12 @@ This repository contains my development setup accross platforms.
 
 ## MacOS
 
-MacOS setup does not use nix since it's not so important to have strict reproducability. The only stuff required to get going is `kitty`, `neovim`, `lazygit`, `uv` and `fzf`. The rest (like docker and stuff) is left to manual installation.
+MacOS setup does not use nix since it's not so important to have strict
+reproducability. The script installs the following packages: `neovim`, `bash`,
+`kitty`, `tree-sitter`, `lazygit`, `fzf`, `fd`, `ripgrep`, `uv`, `node`,
+`btop`, `coreutils`, `sbx`, and `Karabiner-Elements`. 
+It also sets up the neovim python environment, links dotfiles, and configures
+shell profiles.
 
 We can setup the base neovim development environment with : 
 
