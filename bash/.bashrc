@@ -164,6 +164,11 @@ fi
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 export FZF_DEFAULT_COMMAND="fdfind --type d . $HOME"
 
+# fzf key bindings (Ctrl+R history, Ctrl+T files, Alt+C cd) and completion
+if command -v fzf >/dev/null; then
+    eval "$(fzf --bash)"     # zsh: fzf --zsh
+fi
+
 # cdf
 #alias cdf='cd $(fd --full-path "Work/" --type d | fzf --height=45%)'
 # Bounded version (if performances matter)
@@ -185,8 +190,11 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-# Docker bin accessible from a bash shell
-[[ -d "$HOME/.docker/bin" ]] && export PATH="$HOME/.docker/bin:$PATH"
+# uv and other user-local installs
+[ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
+
+# Docker Desktop CLI plugins
+[ -d "$HOME/.docker/bin" ] && PATH="$HOME/.docker/bin:$PATH"
 
 # Alias to quickly enter nix common dev env
 alias dev="nix develop $HOME/dotfiles/nix"
@@ -198,3 +206,6 @@ alias dvenv="rm -rf .venv/"
 
 # Nix quick access
 try() { nix run "nixpkgs#$1" ;}
+
+# sbx
+[ -f "$DOTFILES_PATH/sbx/sbx.sh" ] && . "$DOTFILES_PATH/sbx/sbx.sh"

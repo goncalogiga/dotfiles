@@ -12,6 +12,11 @@ if ! command -v nvim >/dev/null; then
     brew install neovim
 fi
 
+# Install bash if missing
+if ! command -v bash >/dev/null; then
+    brew install --cask bash
+fi
+
 # Install kitty if missing
 if ! command -v kitty >/dev/null; then
     brew install --cask kitty

@@ -7,7 +7,6 @@ filesystem, network, and Docker daemon.
 
 - macOS Sonoma (14) or later, Apple silicon
 - sbx 0.36 or later (kits v2 schema)
-- A Mistral API key from https://console.mistral.ai
 
 ## Install sbx
 
@@ -25,26 +24,29 @@ Check the version:
 sbx version
 ```
 
-## Store the API key
-
-```bash
-sbx secret set mistral -t "sk-..."
-```
-
-The key stays on your host. The proxy injects it into requests to
-`api.mistral.ai`. It never enters the sandbox.
-
 ## Run
 
 ```bash
 cd ~/my-project
-sbx run --kit "$DOTFILES_PATH/sbx/vibe"
+sbx run --kit "$DOTFILES_PATH/sbx/vibe" vibe .
 ```
+
+Arguments: `--kit <path>`, then the agent name (`vibe`, matching `name:`
+in spec.yaml), then the workspace path.
 
 First run asks for a default network policy. Pick **Balanced**.
 
 First run is slow: it pulls the base image, installs uv, then installs
 `mistral-vibe`.
+
+## API key
+
+The kit does not manage credentials. On first launch vibe runs its setup
+wizard — paste a key from https://chat.mistral.ai/code/extensions
+(Code › Vibe CLI). Keys from console.mistral.ai will not work.
+
+The key is saved to `~/.vibe/.env` inside the sandbox. It survives stop
+and re-attach, but not `sbx rm`. Each new sandbox needs it again.
 
 ## Daily use
 
@@ -55,11 +57,14 @@ sbx rm <name>             # delete
 sbx                       # interactive dashboard
 ```
 
-Name a sandbox so you can come back to it:
+Create a named sandbox, then reattach to it later:
 
 ```bash
+sbx create --name myproj --kit "$DOTFILES_PATH/sbx/vibe" vibe .
 sbx run --kit "$DOTFILES_PATH/sbx/vibe" --name myproj
 ```
+
+Pass `--kit` again when re-running an existing sandbox.
 
 ## Network
 
@@ -87,21 +92,25 @@ sbx/vibe/
 Edit `spec.yaml` to change the image, network rules, or install steps.
 Edit `config.toml` to change vibe settings.
 
-## Troubleshooting
-
-Sandbox starts but vibe is missing — check the install step ran:
+Changes to `spec.yaml` only apply to new sandboxes. Recreate to pick
+them up:
 
 ```bash
-sbx exec <name> which vibe
-sbx exec <name> vibe --version
+sbx rm <name> && sb vibe
+```
+
+## Troubleshooting
+
+Sandbox starts but vibe is missing — check where the symlink points. The
+agent runs as uid 1000 and cannot read root's home:
+
+```bash
+sbx exec <name> -- ls -la /usr/local/bin
+sbx exec <name> -- vibe --version
 ```
 
 Vibe hangs at startup — it may be waiting on a trust prompt. Projects
 containing a committed `.vibe/` directory trigger this.
 
-API calls fail — check the secret exists and the domain is allowed:
-
-```bash
-sbx secret ls
-sbx policy ls
-```
+Invalid API key — the key is from console.mistral.ai rather than
+Code › Vibe CLI. Rerun `vibe --setup` inside the sandbox.

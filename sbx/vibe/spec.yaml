@@ -19,17 +19,6 @@ permissions:
       - pypi.org
       - files.pythonhosted.org
 
-credentials:
-  - service: mistral
-    description: Mistral API key for Vibe
-    required: true
-    apiKey:
-      name: MISTRAL_API_KEY
-      proxyManaged: true
-      inject:
-        - domain: api.mistral.ai
-          scheme: bearer
-
 setup:
   install:
     - description: Install uv
