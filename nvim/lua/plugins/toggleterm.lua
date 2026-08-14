@@ -25,7 +25,7 @@ return {
       direction = "vertical",
       close_on_exit = true,
       -- shell = vim.o.shell,
-      shell = "/bin/bash",
+      shell = "/opt/homebrew/bin/bash",
       float_opts = {
         border = "curved",
         winblend = 0,
