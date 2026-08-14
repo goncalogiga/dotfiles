@@ -193,7 +193,10 @@ esac
 # uv and other user-local installs
 [ -d "$HOME/.local/bin" ] && PATH="$HOME/.local/bin:$PATH"
 
-# Docker Desktop CLI plugins
+# Docker Desktop CLI
+[ -d /usr/local/bin ] && PATH="/usr/local/bin:$PATH"
+
+# Docker CLI plugins (compose, buildx)
 [ -d "$HOME/.docker/bin" ] && PATH="$HOME/.docker/bin:$PATH"
 
 # Alias to quickly enter nix common dev env
