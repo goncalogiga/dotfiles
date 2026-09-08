@@ -3,7 +3,7 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-export DOTFILES_PATH=/Users/goncalogiga/Work/git/dotfiles
+export DOTFILES_PATH="$HOME/dotfiles"
 
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
@@ -172,7 +172,15 @@ fi
 # cdf
 #alias cdf='cd $(fd --full-path "Work/" --type d | fzf --height=45%)'
 # Bounded version (if performances matter)
-alias cdf='cd "$(fd --full-path "Work/" --type d --max-depth 5 | fzf --height=45%)"'
+cdf() {
+    local root="$HOME/Work" dir
+    if [ ! -d "$root" ]; then
+        echo "cdf: $root does not exist" >&2
+        return 1
+    fi
+    dir=$(fd --type d --max-depth 5 . "$root" | fzf --height=45%) || return
+    [ -n "$dir" ] && cd "$dir"
+}
 
 # Make PS1 less gigantic
 export PS1='\[\033[01;34m\]$ \[\033[01;32m\]\W\[\033[0m\] \$ '

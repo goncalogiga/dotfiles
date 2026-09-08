@@ -62,3 +62,18 @@ sudo apt-get install git just
 # Clone the repository and run : 
 just install
 ```
+
+### Optional Checklist
+
+- [ ] Firefox (+ Ublock add-on)
+- [ ] KeePassium
+- [ ] Better Display
+- [ ] Karabiner-Elements
+- [ ] Docker
+- [ ] Spotify
+
+- [ ] Tailscale (Personnal)
+- [ ] ProtonVPN (Personnal)
+- [ ] Whatsapp, Signal, Slack (Personnal)
+- [ ] Numbers (Personnal)
+

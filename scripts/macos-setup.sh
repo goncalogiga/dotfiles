@@ -13,8 +13,9 @@ if ! command -v nvim >/dev/null; then
 fi
 
 # Install bash if missing
-if ! command -v bash >/dev/null; then
-    brew install --cask bash
+BREW_PREFIX="$(brew --prefix)"
+if [ ! -x "$BREW_PREFIX/bin/bash" ]; then
+    brew install bash
 fi
 
 # Install kitty if missing
