@@ -32,18 +32,26 @@ sb() {
     local name; name=$(_sbx_name "$harness")
     local kit; kit=$(_sbx_kit "$harness")
 
-    if sbx ls 2>/dev/null | grep -q "\b$name\b"; then
-        sbx run $kit --name "$name"
-    else
+    local run_cmd="sbx run${kit:+ $kit} --name $name"
+    local create_cmd=""
+
+    if ! sbx ls 2>/dev/null | grep -q "\b$name\b"; then
+        create_cmd="sbx create --name $name${kit:+ $kit} $harness $path"
         sbx create --name "$name" $kit "$harness" "$path" || return 1
-        sbx run $kit --name "$name"
     fi
+    sbx run $kit --name "$name"
 
     [ -n "${SBX_QUIET:-}" ] && return
+
+    local ran=""
+    [ -n "$create_cmd" ] && ran+="create       $create_cmd"$'\n'
+    ran+="run          $run_cmd"
 
     cat <<EOF
 
 sandbox: $name   harness: $harness
+
+$ran
 
 shell in     sbx exec $name -- bash
 stop         sbx stop $name
