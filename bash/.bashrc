@@ -170,10 +170,10 @@ if command -v fzf >/dev/null; then
 fi
 
 # cdf
-#alias cdf='cd $(fd --full-path "Work/" --type d | fzf --height=45%)'
+#alias cdf='cd $(fd --full-path "git/" --type d | fzf --height=45%)'
 # Bounded version (if performances matter)
 cdf() {
-    local root="$HOME/Work" dir
+    local root="${1:-$HOME/git}" dir
     if [ ! -d "$root" ]; then
         echo "cdf: $root does not exist" >&2
         return 1

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+NVIM_PYTHON_VERSION=3.14
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 if ! command -v brew >/dev/null; then
@@ -96,7 +98,7 @@ cp "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
 
 # Shared neovim python environment
 NVIM_VENV="${XDG_CACHE_HOME:-$HOME/.cache}/nvim-venv"
-uv venv "$NVIM_VENV"
+uv venv --python "$NVIM_PYTHON_VERSION" "$NVIM_VENV"
 VIRTUAL_ENV="$NVIM_VENV" uv pip install pynvim black isort
 
 # Python-based CLI tools, installed as isolated executables

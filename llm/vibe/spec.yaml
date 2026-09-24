@@ -12,8 +12,9 @@ sandbox:
 permissions:
   network:
     allow:
-      - api.mistral.ai
+      - "*.mistral.*"
       - astral.sh
+      - releases.astral.sh
       - github.com
       - objects.githubusercontent.com
       - pypi.org
@@ -26,9 +27,30 @@ setup:
       command: >-
         curl -LsSf https://astral.sh/uv/install.sh
         | env UV_INSTALL_DIR=/usr/local/bin sh
+
     - description: Install Mistral Vibe
       user: "0"
       command: >-
         UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin
         uv tool install mistral-vibe
         && chmod -R a+rX /opt/uv-tools
+
+    - description: Declare GLM 5.3 model for Vibe
+      user: "0"
+      command: |
+        set -eu
+        U=agent
+        H=$(getent passwd "$U" | cut -d: -f6)
+        [ -n "$H" ] || { echo "user $U not found" >&2; exit 1; }
+        mkdir -p "$H/.vibe"
+        cat > "$H/.vibe/config.toml" <<'EOF'
+        active_model = "glm-5-3"
+
+        [[models]]
+        name = "zai-glm-5-3"
+        provider = "mistral"
+        alias = "glm-5-3"
+        thinking = "high"
+        supports_images = false
+        EOF
+        chown -R "$U": "$H/.vibe"

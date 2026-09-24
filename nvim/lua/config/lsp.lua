@@ -52,6 +52,9 @@ vim.diagnostic.config({
 })
 
 -- Setting up pyright --
+-- The langserver binary itself lives in the dotfiles venv; pyright never runs
+-- project code, so that's fine. Which environment it *analyzes* against is
+-- set per-project below, via the interpreter path.
 vim.lsp.config('pyright', {
     cmd = { 
         vim.fn.expand("$DOTFILES_PATH/.venv/bin/pyright-langserver"), 
@@ -59,10 +62,17 @@ vim.lsp.config('pyright', {
     },
     filetypes = { 'python' },
     on_attach = on_attach,
+    -- Let's search for the virtual env
+    root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
+    before_init = function(_, config)
+        local root = config.root_dir or vim.fn.getcwd()
+        local venv_python = vim.fs.joinpath(root, '.venv', 'bin', 'python')
+        if vim.fn.executable(venv_python) == 1 then
+            config.settings.python.pythonPath = venv_python
+        end
+    end,
     settings = {
         python = {
-            venvPath = ".",
-            venv = ".venv",
             analysis = {
                 typeCheckingMode = "off",
                 autoSearchPaths = true,
