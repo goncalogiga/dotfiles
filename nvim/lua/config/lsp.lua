@@ -2,6 +2,17 @@ local cmp = require('cmp')
 local luasnip = require('luasnip')
 require('luasnip.loaders.from_vscode').lazy_load()
 
+-- Inital Health checks
+local dotfiles = vim.env.DOTFILES_PATH
+if not dotfiles then
+    vim.notify("DOTFILES_PATH is not set", vim.log.levels.ERROR)
+end
+local langserver = (dotfiles or "") .. "/.venv/bin/pyright-langserver"
+if vim.fn.executable(langserver) == 0 then
+    vim.notify("pyright-langserver not found at " .. langserver, vim.log.levels.ERROR)
+end
+
+
 -- Python system setup --
 vim.g.python3_host_prog = vim.fn.expand("$DOTFILES_PATH/.venv/bin/python")
 
@@ -27,21 +38,24 @@ cmp.setup({
     },
 })
 
--- Key maps --
-local on_attach = function(client, bufnr)
-    local opts = { buffer = bufnr, remap = false }
 
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
-    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
-    vim.keymap.set("n", "<leader>ek", vim.diagnostic.goto_next, opts)
-    vim.keymap.set("n", "<leader>ej", vim.diagnostic.goto_prev, opts)
-    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
-    vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
-    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
-    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
-end
+-- Key maps --
+vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(args)
+        local opts = { buffer = args.buf, remap = false }
+        vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+        vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+        vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
+        vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
+        vim.keymap.set("n", "<leader>ek", vim.diagnostic.goto_next, opts)
+        vim.keymap.set("n", "<leader>ej", vim.diagnostic.goto_prev, opts)
+        vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
+        vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
+        vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
+        vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
+    end,
+})
+
 
 -- Defining syntax error format --
 vim.diagnostic.config({
@@ -50,6 +64,7 @@ vim.diagnostic.config({
     underline = true,
     update_in_insert = false,
 })
+
 
 -- Setting up pyright --
 -- The langserver binary itself lives in the dotfiles venv; pyright never runs

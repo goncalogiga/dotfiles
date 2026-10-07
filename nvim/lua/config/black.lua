@@ -1,3 +1,14 @@
+-- Inital Health checks
+local dotfiles = vim.env.DOTFILES_PATH
+if not dotfiles then
+    vim.notify("DOTFILES_PATH is not set", vim.log.levels.ERROR)
+end
+local black = (dotfiles or "") .. "/.venv/bin/black"
+if vim.fn.executable(black) == 0 then
+    vim.notify("black not found at " .. black, vim.log.levels.ERROR)
+end
+
+
 local bin = vim.fn.expand("$DOTFILES_PATH/.venv/bin/")
 
 vim.api.nvim_create_autocmd("BufWritePost", {
