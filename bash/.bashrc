@@ -97,23 +97,6 @@ if [[ "$(uname)" == "Darwin" ]] && command -v gls >/dev/null; then
     eval "$(gdircolors -b)"
 fi
 
-# Neovim + Python venv
-n() {
-    local venv=""
-    for c in .venv venv; do
-        [[ -f "$c/bin/activate" ]] && { venv="$PWD/$c"; break; }
-    done
-
-    if [[ -z "$venv" ]]; then
-        venv="${XDG_CACHE_HOME:-$HOME/.cache}/nvim-venv"
-        [[ -x "$venv/bin/python" ]] || uv venv "$venv"
-    fi
-
-    source "$venv/bin/activate"
-    "$venv/bin/python" -c 'import pynvim' 2>/dev/null || VIRTUAL_ENV="$venv" uv pip install pynvim
-    nvim "$@"
-}
-
 # IPython
 p() {
     local venv=""
@@ -130,6 +113,9 @@ p() {
     "$venv/bin/python" -c 'import ipython' 2>/dev/null || VIRTUAL_ENV="$venv" uv pip install ipython
     ipython
 }
+
+# neovim alias
+alias n=nvim
 
 # some more ls aliases
 alias ll='ls -alF'
