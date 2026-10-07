@@ -204,5 +204,6 @@ alias dvenv="rm -rf .venv/"
 # Nix quick access
 try() { nix run "nixpkgs#$1" ;}
 
-# sbx
-[ -f "$DOTFILES_PATH/sbx/sbx.sh" ] && . "$DOTFILES_PATH/sbx/sbx.sh"
+# sbx for mistral vibe
+export SBX_VIBE_PATH="$DOTFILES_PATH/llm/vibe/"
+[ -f "$SBX_VIBE_PATH/vibe.sh" ] && . "$SBX_VIBE_PATH/vibe.sh"
