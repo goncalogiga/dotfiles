@@ -8,8 +8,8 @@ function vibe() {
 		local dir=$(realpath $arg)
 		local name="$(basename $dir)"
 
-		echo "Running 'sbx run --kit "$vibe_kit_path" --name "$name" vibe "$dir"'"
-		sbx run --kit "$vibe_kit_path" --name "$name" vibe "$dir"
+		echo "Running 'sbx run "$vibe_kit_path" --name "$name" vibe "$dir" || sbx run --name "$name"'"
+		sbx run "$vibe_kit_path" --name "$name" vibe "$dir" || sbx run --name "$name"
 	else
 		echo "$arg is not a directory."
 	fi
