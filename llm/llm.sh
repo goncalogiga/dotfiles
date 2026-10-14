@@ -12,10 +12,11 @@ function _sbx_run_kit() {
     local prefix=$1
     local kit_path=$2
     local arg=${3:-$PWD}
+    local custom_name=$4
 
     if [ -d "$arg" ]; then
         local dir=$(realpath "$arg")
-        local name="$prefix-$(basename "$dir")"
+        local name=${custom_name:-"$prefix-$(basename "$dir")"}
 
         if sbx ls -q | grep -qx "$name"; then
             sbx run --name "$name"
@@ -45,10 +46,11 @@ function pi() {
 # ============================================================
 
 
-# List existing feature sandboxes for a harness (prefix stripped)
+# List existing feature sandboxes for a harness (harness and repo prefix stripped)
 function _vibetree_list() {
     local harness="$1"
-    sbx ls -q 2>/dev/null | grep "^${harness}-feat-" | sed "s/^${harness}-//" || true
+    local repo_name="$2"
+    sbx ls -q 2>/dev/null | grep "^${harness}-${repo_name}-" | sed "s/^${harness}-${repo_name}-//" || true
 }
 
 
@@ -73,29 +75,28 @@ function _vibetree_new() {
         return 1
     fi
 
-    local repo_root worktree_name worktree_path
-    repo_root=$(git rev-parse --show-toplevel)
+    local repo_root repo_name worktree_name worktree_path
+    repo_root=$(git rev-parse --show-toplevel) || { echo "vibetree: not in a git repository"; return 1; }
+    repo_name=$(basename "$repo_root")
     worktree_name=$(printf '%s' "$feature" | tr '/' '-')
-    worktree_path="$repo_root/.vibetrees/$worktree_name"
-
-    echo "vibetree: branch $feature"
+    worktree_path="$HOME/.vibetrees/$repo_name/$worktree_name"
 
     echo "vibetree: branch $feature"
 
     if [ -d "$worktree_path" ]; then
-        echo "vibetree: reusing worktree .vibetrees/$worktree_name"
+        echo "vibetree: reusing worktree ~/.vibetrees/$repo_name/$worktree_name"
     else
-        mkdir -p "$repo_root/.vibetrees"
+        mkdir -p "$HOME/.vibetrees/$repo_name"
         if git -C "$repo_root" show-ref --verify --quiet "refs/heads/$feature"; then
-            echo "vibetree: creating worktree .vibetrees/$worktree_name (existing branch)"
+            echo "vibetree: creating worktree ~/.vibetrees/$repo_name/$worktree_name (existing branch)"
             git -C "$repo_root" worktree add "$worktree_path" "$feature" || return 1
         else
-            echo "vibetree: creating worktree .vibetrees/$worktree_name (new branch)"
+            echo "vibetree: creating worktree ~/.vibetrees/$repo_name/$worktree_name (new branch)"
             git -C "$repo_root" worktree add -b "$feature" "$worktree_path" || return 1
         fi
     fi
 
-    _sbx_run_kit "$harness" "$DOTFILES_PATH/llm/$harness/" "$worktree_path"
+    _sbx_run_kit "$harness" "$DOTFILES_PATH/llm/$harness/" "$worktree_path" "$harness-$repo_name-$worktree_name"
 }
 
 
@@ -132,6 +133,10 @@ function vibetree() {
         esac
     done
 
+    local repo_root repo_name
+    repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "vibetree: not in a git repository"; return 1; }
+    repo_name=$(basename "$repo_root")
+
     if [ -n "$feature" ]; then
         _vibetree_new "$harness" "$feature"
         return
@@ -143,7 +148,7 @@ function vibetree() {
     fi
 
     local existing choice
-    existing=$(_vibetree_list "$harness")
+    existing=$(_vibetree_list "$harness" "$repo_name")
 
     if [ -n "$existing" ]; then
         choice=$(printf '%s\n+ new feature\n' "$existing" \
@@ -160,7 +165,7 @@ function vibetree() {
         [ -z "$new_feature" ] && return 0
         _vibetree_new "$harness" "$new_feature"
     else
-        echo "vibetree: attaching to ${harness}-${choice}"
-        sbx run --name "${harness}-${choice}"
+        echo "vibetree: attaching to ${harness}-${repo_name}-${choice}"
+        sbx run --name "${harness}-${repo_name}-${choice}"
     fi
 }

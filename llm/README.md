@@ -30,7 +30,9 @@ Launch a sandbox in a directory (default: current directory). Reuses the sandbox
 
 ### Worktree mode
 
-`vibetree` manages feature worktrees with their own sandboxes. Without arguments it shows an interactive menu (requires `fzf`) to pick an existing feature or create a new one.
+`vibetree` manages feature worktrees with their own sandboxes. Without
+arguments it shows an interactive menu (requires `fzf`) to pick an existing
+feature or create a new one.
 
 ```shell
 vibetree                            # interactive menu (vibe)
@@ -39,13 +41,4 @@ vibetree "my feature"               # new worktree (vibe)
 vibetree --harness pi "my feature"  # new worktree (pi)
 ```
 
-Worktrees are stored in `.vibetrees/` inside the repo.
-
-### Ignoring `.vibetrees/`
-
-To keep the `.vibetrees/` directory out of git status across all repos, set up a global gitignore:
-
-```shell
-git config --global core.excludesFile '~/.gitignore'
-echo '.vibetrees/' >> ~/.gitignore
-```
+Worktrees are stored in `~/.vibetrees/<repo>/`.
