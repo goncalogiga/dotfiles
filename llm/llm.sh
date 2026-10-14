@@ -80,6 +80,8 @@ function _vibetree_new() {
 
     echo "vibetree: branch $feature"
 
+    echo "vibetree: branch $feature"
+
     if [ -d "$worktree_path" ]; then
         echo "vibetree: reusing worktree .worktrees/$worktree_name"
     else
