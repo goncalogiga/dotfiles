@@ -1,5 +1,12 @@
+# Some functions to follow the workflows defined here :
+# https://docs.docker.com/ai/sandboxes/workflows/git/
+
+
 # ============================================================
-#
+#                      Direct Mode
+# ============================================================
+
+
 # A helper function to launch sbx run with different harnesses
 function _sbx_run_kit() {
     local prefix=$1
@@ -34,20 +41,21 @@ function pi() {
 
 
 # ============================================================
-#
-# Vibe code: create a worktree and launch a sandbox in it
-# Usage: vc [harness] <feature>
-#   vc my-feature       → vibe harness, branch feat/my-feature
-#   vc pi my-feature    → pi harness, branch feat/my-feature
-function vc() {
-    local harness="vibe"
-    local feature=""
+#                      Worktree mode
+# ============================================================
 
-    case $# in
-        1) feature="$1" ;;
-        2) harness="$1"; feature="$2" ;;
-        *) echo "Usage: vc [harness] <feature>"; return 1 ;;
-    esac
+
+# List existing feature sandboxes for a harness (prefix stripped)
+function _vibetree_list() {
+    local harness="$1"
+    sbx ls -q 2>/dev/null | grep "^${harness}-feat-" | sed "s/^${harness}-//" || true
+}
+
+
+# Create a worktree for a feature and launch a sandbox in it
+function _vibetree_new() {
+    local harness="$1"
+    local feature="$2"
 
     feature=$(printf '%s' "$feature" \
         | tr '[:upper:]' '[:lower:]' \
@@ -61,22 +69,96 @@ function vc() {
     esac
 
     if ! git check-ref-format --branch "$feature" 2>/dev/null; then
-        echo "vc: invalid feature name '$feature'"
+        echo "vibetree: invalid feature name '$feature'"
         return 1
     fi
 
     local repo_root worktree_name worktree_path
     repo_root=$(git rev-parse --show-toplevel)
     worktree_name=$(printf '%s' "$feature" | tr '/' '-')
-    worktree_path="$repo_root/../$worktree_name"
+    worktree_path="$repo_root/.worktrees/$worktree_name"
+
+    echo "vibetree: branch $feature"
 
     if [ -d "$worktree_path" ]; then
-        echo "vc: reusing worktree $worktree_path"
-    elif git -C "$repo_root" show-ref --verify --quiet "refs/heads/$feature"; then
-        git -C "$repo_root" worktree add "$worktree_path" "$feature" || return 1
+        echo "vibetree: reusing worktree .worktrees/$worktree_name"
     else
-        git -C "$repo_root" worktree add -b "$feature" "$worktree_path" || return 1
+        mkdir -p "$repo_root/.worktrees"
+        if git -C "$repo_root" show-ref --verify --quiet "refs/heads/$feature"; then
+            echo "vibetree: creating worktree .worktrees/$worktree_name (existing branch)"
+            git -C "$repo_root" worktree add "$worktree_path" "$feature" || return 1
+        else
+            echo "vibetree: creating worktree .worktrees/$worktree_name (new branch)"
+            git -C "$repo_root" worktree add -b "$feature" "$worktree_path" || return 1
+        fi
     fi
 
     _sbx_run_kit "$harness" "$DOTFILES_PATH/llm/$harness/" "$worktree_path"
+}
+
+
+# Vibe tree: pick an existing sandbox or create a new feature worktree
+# Usage: vibetree [--harness <name>] [feature]
+#   vibetree                           → interactive menu (vibe)
+#   vibetree --harness pi              → interactive menu (pi)
+#   vibetree "my feature"              → new worktree (vibe)
+#   vibetree --harness pi "my feature" → new worktree (pi)
+function vibetree() {
+    local harness="vibe"
+    local feature=""
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --harness)
+                [ $# -ge 2 ] || { echo "vibetree: --harness requires a value"; return 1; }
+                harness="$2"
+                shift 2
+                ;;
+            --harness=*)
+                harness="${1#--harness=}"
+                shift
+                ;;
+            -*)
+                echo "vibetree: unknown option '$1'"
+                return 1
+                ;;
+            *)
+                [ -z "$feature" ] || { echo "vibetree: unexpected argument '$1'"; return 1; }
+                feature="$1"
+                shift
+                ;;
+        esac
+    done
+
+    if [ -n "$feature" ]; then
+        _vibetree_new "$harness" "$feature"
+        return
+    fi
+
+    if ! command -v fzf >/dev/null; then
+        echo "vibetree: fzf is required"
+        return 1
+    fi
+
+    local existing choice
+    existing=$(_vibetree_list "$harness")
+
+    if [ -n "$existing" ]; then
+        choice=$(printf '%s\n+ new feature\n' "$existing" \
+            | fzf --prompt="$harness > " --height=10 --reverse)
+        [ -z "$choice" ] && return 0
+    else
+        echo "vibetree: no existing features for '$harness'"
+        choice="+ new feature"
+    fi
+
+    if [ "$choice" = "+ new feature" ]; then
+        local new_feature
+        read -r -p "Feature: " new_feature
+        [ -z "$new_feature" ] && return 0
+        _vibetree_new "$harness" "$new_feature"
+    else
+        echo "vibetree: attaching to ${harness}-${choice}"
+        sbx run --name "${harness}-${choice}"
+    fi
 }
