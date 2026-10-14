@@ -1,0 +1,24 @@
+schemaVersion: "2"
+kind: sandbox
+name: pi
+description: Pi coding agent on Mistral Large 4
+
+sandbox:
+  image: docker.io/sbx/pi-image:latest
+  entrypoint: ["pi", "--model", "mistral/mistral-large-4", "--thinking", "high"]
+
+agentInstructions:
+  filename: AGENTS.md
+
+permissions:
+  network:
+    allow:
+      - "*.mistral.*"
+      - astral.sh
+      - releases.astral.sh
+      - github.com
+      - objects.githubusercontent.com
+      - pypi.org
+      - files.pythonhosted.org
+      - registry.npmjs.org
+      - pi.dev

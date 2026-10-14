@@ -20,6 +20,8 @@ permissions:
       - pypi.org
       - files.pythonhosted.org
 
+# We must setup vibe ourselves, since it is not yet supported by
+# docker sandboxes
 setup:
   install:
     - description: Install uv
@@ -34,3 +36,21 @@ setup:
         UV_TOOL_DIR=/opt/uv-tools UV_TOOL_BIN_DIR=/usr/local/bin
         uv tool install mistral-vibe
         && chmod -R a+rX /opt/uv-tools
+
+    - description: Set default model to Mistral Large 4
+      user: "1000"
+      command: |
+        set -e
+        mkdir -p "$HOME/.vibe"
+        if [ ! -f "$HOME/.vibe/config.toml" ]; then
+        cat > "$HOME/.vibe/config.toml" <<'EOF'
+        active_model = "mistral-large-4"
+
+        [[models]]
+        name = "mistral-large-4"
+        provider = "mistral"
+        alias = "mistral-large-4"
+        thinking = "high"
+        supports_images = true
+        EOF
+        fi
