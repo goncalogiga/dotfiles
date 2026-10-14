@@ -76,21 +76,21 @@ function _vibetree_new() {
     local repo_root worktree_name worktree_path
     repo_root=$(git rev-parse --show-toplevel)
     worktree_name=$(printf '%s' "$feature" | tr '/' '-')
-    worktree_path="$repo_root/.worktrees/$worktree_name"
+    worktree_path="$repo_root/.vibetrees/$worktree_name"
 
     echo "vibetree: branch $feature"
 
     echo "vibetree: branch $feature"
 
     if [ -d "$worktree_path" ]; then
-        echo "vibetree: reusing worktree .worktrees/$worktree_name"
+        echo "vibetree: reusing worktree .vibetrees/$worktree_name"
     else
-        mkdir -p "$repo_root/.worktrees"
+        mkdir -p "$repo_root/.vibetrees"
         if git -C "$repo_root" show-ref --verify --quiet "refs/heads/$feature"; then
-            echo "vibetree: creating worktree .worktrees/$worktree_name (existing branch)"
+            echo "vibetree: creating worktree .vibetrees/$worktree_name (existing branch)"
             git -C "$repo_root" worktree add "$worktree_path" "$feature" || return 1
         else
-            echo "vibetree: creating worktree .worktrees/$worktree_name (new branch)"
+            echo "vibetree: creating worktree .vibetrees/$worktree_name (new branch)"
             git -C "$repo_root" worktree add -b "$feature" "$worktree_path" || return 1
         fi
     fi
