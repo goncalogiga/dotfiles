@@ -49,7 +49,8 @@ vim.o.title = true
 -- Function to get Git root or fallback to file directory
 local function get_git_or_dir()
     local filepath = vim.fn.expand('%:p')
-    local git_root = vim.fn.systemlist('git -C "' .. vim.fn.fnamemodify(filepath, ':h') .. '" rev-parse --show-toplevel')[1]
+    local dir = vim.fn.fnamemodify(filepath, ':h')
+    local git_root = vim.fn.systemlist({ "git", "-C", dir, "rev-parse", "--show-toplevel" })[1]
 
     if vim.v.shell_error == 0 and git_root and git_root ~= '' then
         return vim.fn.fnamemodify(git_root, ':t')  -- Git repo name

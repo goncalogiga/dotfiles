@@ -12,7 +12,7 @@ function _sbx_run_kit() {
     local prefix=$1
     local kit_path=$2
     local arg=${3:-$PWD}
-    local custom_name=$4
+    local custom_name=${4:-}
 
     if [ -d "$arg" ]; then
         local dir=$(realpath "$arg")

@@ -18,15 +18,3 @@ dev:
 # Update the nix flake
 update:
     nix flake update
-
-# Encrypt secrets
-encrypt:
-    bash scripts/secrets.sh encrypt secrets/
-
-# Decrypt secrets
-decrypt:
-    bash scripts/secrets.sh decrypt secrets/
-
-# Setup git hooks
-setup-hooks:
-    git config core.hooksPath git/hooks/

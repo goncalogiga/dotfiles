@@ -77,6 +77,14 @@ if ! command -v sbx >/dev/null; then
     fi
 fi
 
+# Disable SSH agent forwarding into sandboxes (enabled by default in sbx):
+# sandboxed agents must not be able to sign with your host SSH keys.
+# llm.sh also unsets SSH_AUTH_SOCK per launch as defense in depth.
+if command -v sbx >/dev/null; then
+    sbx settings set ssh.agentForwardingEnabled false
+    sbx daemon restart
+fi
+
 # Install Karabiner-Elements if missing
 if ! [ -d "/Applications/Karabiner-Elements.app" ]; then
     brew install --cask karabiner-elements

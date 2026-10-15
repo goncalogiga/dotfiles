@@ -17,6 +17,17 @@ Add your Mistral API key to sandboxes:
 sbx secret set-custom --host api.mistral.ai --env MISTRAL_API_KEY --value "$MISTRAL_API_KEY"
 ```
 
+SSH agent forwarding is enabled by default in Docker Sandboxes, which would
+let a sandboxed agent sign with your host SSH keys (Git auth, commit
+signing). `macos-setup.sh` disables forwarding globally:
+
+```shell
+sbx settings set ssh.agentForwardingEnabled false
+sbx daemon restart
+```
+
+Re-enable it only if you want an agent to push to GitHub for you.
+
 ## Commands
 
 ### Direct mode

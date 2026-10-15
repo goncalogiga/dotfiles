@@ -2,7 +2,6 @@
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SECRETS_DIR="$DOTFILES_DIR/decrypted/"
 
 # System packages
 if command -v apt >/dev/null; then
@@ -62,22 +61,11 @@ done
 # Setup linux preferences
 bash linux/ubuntu_preferences.sh
 
-# Decrypt secrets
-just decrypt || echo "Warning: 'just decrypt' failed, skipping secrets."
-
-# Correctly setup encryption checks (pre-commit hooks)
-just setup-hooks
-
 # Add python virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
 pip install pyright pynvim black isort
 deactivate
-
-# Link ssh 
-ln -sf "$SECRETS_DIR/ssh/id_ed25519" "$HOME/.ssh/id_ed25519"
-ln -sf "$SECRETS_DIR/ssh/id_ed25519.pub" "$HOME/.ssh/id_ed25519.pub"
-ln -sf "$SECRETS_DIR/ssh/known_hosts" "$HOME/.ssh/known_hosts"
 
 # Install and setup docker
 bash scripts/docker.sh
