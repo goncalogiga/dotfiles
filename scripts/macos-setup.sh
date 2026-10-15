@@ -90,6 +90,11 @@ if ! [ -d "/Applications/Karabiner-Elements.app" ]; then
     brew install --cask karabiner-elements
 fi
 
+# Install Vorssaint if missing
+if ! [ -d "/Applications/Vorssaint.app" ]; then
+    brew install --cask vorssaint
+fi
+
 # Link Karabiner config
 KARABINER_DIR="$HOME/.config/karabiner/assets/complex_modifications"
 mkdir -p "$KARABINER_DIR"
