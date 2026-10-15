@@ -20,8 +20,6 @@ permissions:
       - pypi.org
       - files.pythonhosted.org
 
-# We must setup vibe ourselves, since it is not yet supported by
-# docker sandboxes
 setup:
   install:
     - description: Install uv

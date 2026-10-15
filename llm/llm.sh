@@ -41,6 +41,9 @@ function pi() {
 }
 
 
+# ... more harnesses here
+
+
 # ============================================================
 #                      Worktree mode
 # ============================================================
@@ -50,7 +53,11 @@ function pi() {
 function _vibetree_list() {
     local harness="$1"
     local repo_name="$2"
-    sbx ls -q 2>/dev/null | grep "^${harness}-${repo_name}-" | sed "s/^${harness}-${repo_name}-//" || true
+
+    sbx ls -q 2>/dev/null \
+        | grep "^${harness}-${repo_name}-" \
+        | sed "s/^${harness}-${repo_name}-//" \
+        || true
 }
 
 
@@ -87,13 +94,14 @@ function _vibetree_new() {
         echo "vibetree: reusing worktree ~/.vibetrees/$repo_name/$worktree_name"
     else
         mkdir -p "$HOME/.vibetrees/$repo_name"
+
         if git -C "$repo_root" show-ref --verify --quiet "refs/heads/$feature"; then
-            echo "vibetree: creating worktree ~/.vibetrees/$repo_name/$worktree_name (existing branch)"
             git -C "$repo_root" worktree add "$worktree_path" "$feature" || return 1
         else
-            echo "vibetree: creating worktree ~/.vibetrees/$repo_name/$worktree_name (new branch)"
             git -C "$repo_root" worktree add -b "$feature" "$worktree_path" || return 1
         fi
+
+        echo "vibetree: creating worktree ~/.vibetrees/$repo_name/$worktree_name"
     fi
 
     _sbx_run_kit "$harness" "$DOTFILES_PATH/llm/$harness/" "$worktree_path" "$harness-$repo_name-$worktree_name"
