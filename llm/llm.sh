@@ -3,6 +3,112 @@
 
 
 # ============================================================
+#              Gitignored-file stashing
+# ============================================================
+
+
+# Sandboxes bind-mount the workspace, so gitignored files (decrypted/
+# secrets, .venv, ...) are readable by the agent. Before launching, move
+# them out of the workspace into a per-directory stash; they are restored
+# when the sandbox exits. Disable with SBX_STASH_IGNORED=0.
+
+
+function _sbx_stash_dir() {
+    local root=${SBX_STASH_ROOT:-$HOME/.vibetrees/stash}
+    local key=$(printf '%s' "$(realpath "$1")" | cksum | cut -d' ' -f1)
+    echo "$root/$key"
+}
+
+
+# Move gitignored files out of the workspace
+function _sbx_stash_ignored() {
+    local dir=$1
+
+    [ "${SBX_STASH_IGNORED:-1}" = "1" ] || return 0
+    git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 0
+
+    local stash files
+    stash=$(_sbx_stash_dir "$dir")
+    files="$stash/files"
+
+    case "$stash/" in
+        "$dir"/*)
+            echo "sbx: stash dir $stash is inside the workspace; refusing to launch" >&2
+            echo "sbx: set SBX_STASH_ROOT outside the workspace, or SBX_STASH_IGNORED=0 to skip" >&2
+            return 1
+            ;;
+    esac
+
+    if [ -d "$stash/lock" ]; then
+        echo "sbx: another session is already stashing ignored files for $dir" >&2
+        echo "sbx: refusing to launch (gitignored files would be exposed)" >&2
+        return 1
+    fi
+
+    if [ -d "$files" ]; then
+        echo "sbx: recovering leftover stash for $dir"
+        _sbx_restore_ignored "$dir" || return 1
+    fi
+
+    # mkdir is atomic: it doubles as the lock against concurrent launches
+    mkdir -p "$stash" || return 1
+    if ! mkdir "$stash/lock" 2>/dev/null; then
+        echo "sbx: another session is already stashing ignored files for $dir" >&2
+        echo "sbx: refusing to launch (gitignored files would be exposed)" >&2
+        return 1
+    fi
+
+    if ! mkdir -p "$files"; then
+        _sbx_restore_ignored "$dir"
+        return 1
+    fi
+
+    local rel moved=0
+    while IFS= read -r -d '' rel; do
+        if ! mkdir -p "$files/$(dirname "$rel")" || ! mv "$dir/$rel" "$files/$rel"; then
+            echo "sbx: failed to stash $rel; rolling back" >&2
+            _sbx_restore_ignored "$dir"
+            return 1
+        fi
+        moved=$((moved + 1))
+    done < <(git -C "$dir" ls-files --others --ignored --exclude-standard -z)
+
+    if [ "$moved" -gt 0 ]; then
+        echo "sbx: stashed $moved gitignored file(s) from $dir (restored on exit)"
+    fi
+}
+
+
+# Move stashed gitignored files back into the workspace
+function _sbx_restore_ignored() {
+    local dir=$1
+
+    local stash files
+    stash=$(_sbx_stash_dir "$dir")
+    files="$stash/files"
+
+    if [ -d "$files" ]; then
+        local rel
+        while IFS= read -r -d '' rel; do
+            rel=${rel#"$files"/}
+            if [ -e "$dir/$rel" ]; then
+                echo "sbx: warning: $rel was recreated in the sandbox; stashed copy kept at $files/$rel" >&2
+                continue
+            fi
+            mkdir -p "$dir/$(dirname "$rel")"
+            mv "$files/$rel" "$dir/$rel"
+        done < <(find "$files" \( -type f -o -type l \) -print0)
+
+        find "$files" -depth -type d -empty -delete 2>/dev/null
+    fi
+
+    rmdir "$stash/lock" 2>/dev/null
+    rmdir "$stash" 2>/dev/null
+    return 0
+}
+
+
+# ============================================================
 #                      Direct Mode
 # ============================================================
 
@@ -18,11 +124,31 @@ function _sbx_run_kit() {
         local dir=$(realpath "$arg")
         local name=${custom_name:-"$prefix-$(basename "$dir")"}
 
+        _sbx_stash_ignored "$dir" || return 1
+
+        # Safety net: restore the stash even if the shell exits mid-run.
+        # (trap -p must be redirected to a file: $(...) runs in a subshell,
+        # which resets traps and would lose a pre-existing EXIT trap.)
+        local trap_file
+        trap_file=$(mktemp)
+        trap -p EXIT > "$trap_file"
+        trap "_sbx_restore_ignored '$dir'" EXIT
+
         if sbx ls -q | grep -qx "$name"; then
             sbx run --name "$name"
         else
             sbx run "$kit_path" --name "$name" "$dir"
         fi
+        local rc=$?
+
+        _sbx_restore_ignored "$dir"
+        if [ -s "$trap_file" ]; then
+            eval "$(cat "$trap_file")"
+        else
+            trap - EXIT
+        fi
+        rm -f "$trap_file"
+        return $rc
     else
         echo "$arg is not a directory."
     fi
