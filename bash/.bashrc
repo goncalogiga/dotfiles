@@ -3,6 +3,11 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+# Non-NixOS Linux : home-manager session variables (nix/home-linux.nix)
+if [[ -f "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ]]; then
+  . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+fi
+
 export DOTFILES_PATH="$HOME/dotfiles"
 alias dotfiles="cd $DOTFILES_PATH"
 
@@ -196,6 +201,11 @@ esac
 
 # Alias to quickly enter nix common dev env
 alias dev="nix develop $HOME/dotfiles/nix"
+
+# Apply the home-manager config (non-NixOS Linux, NixOS defines its own rebuild)
+if command -v home-manager >/dev/null; then
+    alias rebuild='home-manager switch --flake ~/dotfiles/nix#goncalo-$(uname -m)'
+fi
 
 # Python stuff
 alias cvenv="uv venv"

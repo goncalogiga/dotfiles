@@ -38,6 +38,7 @@ Launch a sandbox in a directory (default: current directory). Reuses the sandbox
 |---------|-------------|
 | `vibe [dir]` | Launch a Vibe sandbox. |
 | `pi [dir]` | Launch a Pi sandbox. |
+| `claude [args]` | Launch a Claude Code sandbox with the built-in `claude` agent. Arguments are passed to `sbx run`. |
 
 ### Worktree mode
 
@@ -52,4 +53,5 @@ vibetree "my feature"               # new worktree (vibe)
 vibetree --harness pi "my feature"  # new worktree (pi)
 ```
 
-Worktrees are stored in `~/.vibetrees/<repo>/`.
+Worktrees are stored in `~/.vibetrees/<repo>/`. Only harnesses with a spec
+in `llm/<harness>/` (`vibe`, `pi`) work with `vibetree`, so `claude` doesn't.

@@ -95,6 +95,20 @@ if ! [ -d "/Applications/Vorssaint.app" ]; then
     brew install --cask vorssaint
 fi
 
+# Dock: only show running apps (pinned apps are hidden, not removed) and
+# auto-hide. Both are set together since restarting the Dock can reset
+# autohide. killall restarts the Dock to apply them.
+# Revert: defaults write com.apple.dock static-only -bool false && killall Dock
+defaults write com.apple.dock static-only -bool true
+defaults write com.apple.dock autohide -bool true
+killall Dock
+
+# Finder: hide desktop icons (files stay in ~/Desktop). killall restarts
+# Finder to apply it.
+# Revert: defaults write com.apple.finder CreateDesktop -bool true && killall Finder
+defaults write com.apple.finder CreateDesktop -bool false
+killall Finder
+
 # Link Karabiner config
 KARABINER_DIR="$HOME/.config/karabiner/assets/complex_modifications"
 mkdir -p "$KARABINER_DIR"
@@ -105,14 +119,13 @@ mkdir -p "$HOME/.config"
 ln -sf "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
 ln -sf "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
 
-# Link shell configs
-cp "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+# Link shell config
 cp "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
 
-# Shared neovim python environment
-NVIM_VENV="${XDG_CACHE_HOME:-$HOME/.cache}/nvim-venv"
-uv venv --python "$NVIM_PYTHON_VERSION" "$NVIM_VENV"
-VIRTUAL_ENV="$NVIM_VENV" uv pip install pynvim black isort
+# Neovim python environment, nvim/lua/config/lsp.lua expects it in $DOTFILES_PATH/.venv
+NVIM_VENV="$DOTFILES_DIR/.venv"
+uv venv --allow-existing --python "$NVIM_PYTHON_VERSION" "$NVIM_VENV"
+VIRTUAL_ENV="$NVIM_VENV" uv pip install pynvim black isort pyright
 
 # Python-based CLI tools, installed as isolated executables
 uv tool install pyright
