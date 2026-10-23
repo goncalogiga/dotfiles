@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, pkgs, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/dotfiles";
@@ -25,19 +25,6 @@ in
   home.file."dotfiles/.venv" = {
     source = nvimVenv;
     recursive = true;
-  };
-
-  dconf.settings = {
-    "org/gnome/shell".favorite-apps = [
-      "kitty.desktop"
-      "firefox.desktop"
-      "org.gnome.Nautilus.desktop"
-    ];
-    "org/gnome/desktop/input-sources".sources = [
-      (lib.hm.gvariant.mkTuple [ "xkb" "fr" ])
-    ];
-    # The display is software-rendered under Apple Virtualization
-    "org/gnome/desktop/interface".enable-animations = false;
   };
 
   home.stateVersion = "26.05";

@@ -6,9 +6,11 @@ the dotfiles from this repo symlinked in place.
 
 | File | Purpose |
 |------|---------|
-| `flake.nix` | Inputs, the `utm` system, the `install` app and the dev shell |
+| `flake.nix` | Inputs, the `utm` system, the `install` app, the home-manager configs and the dev shell |
 | `configuration.nix` | System: boot, desktop, UTM integration, user, packages |
 | `home.nix` | home-manager: links nvim, kitty and bash configs from `~/dotfiles` |
+| `home-utm.nix` | home-manager: GNOME settings for the VM |
+| `home-linux.nix` | home-manager on non-NixOS Linux: packages, font, user |
 | `disko.nix` | Disk layout (EFI + ext4 on `/dev/vda`) |
 | `packages.nix` | CLI tools shared by the VM and `nix develop` |
 | `install.sh` | Installer run from the live ISO |
@@ -58,7 +60,11 @@ apply without a rebuild.
 - **Prebuilt binaries** (uv-managed Pythons, plugin downloads) work through
   `nix-ld`.
 
-## Dev shell (non-NixOS Linux)
+## Other Linux distributions
+
+`scripts/setup.sh` applies `home.nix` and `home-linux.nix` with standalone
+home-manager, see the [main README](../README.md#linux). The dev shell is still
+available on any Linux with nix:
 
 ```bash
 nix develop ~/dotfiles/nix

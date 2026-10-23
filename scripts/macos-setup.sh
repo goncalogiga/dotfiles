@@ -105,14 +105,13 @@ mkdir -p "$HOME/.config"
 ln -sf "$DOTFILES_DIR/nvim" "$HOME/.config/nvim"
 ln -sf "$DOTFILES_DIR/kitty" "$HOME/.config/kitty"
 
-# Link shell configs
-cp "$DOTFILES_DIR/zsh/.zshrc" "$HOME/.zshrc"
+# Link shell config
 cp "$DOTFILES_DIR/bash/.bashrc" "$HOME/.bashrc"
 
-# Shared neovim python environment
-NVIM_VENV="${XDG_CACHE_HOME:-$HOME/.cache}/nvim-venv"
-uv venv --python "$NVIM_PYTHON_VERSION" "$NVIM_VENV"
-VIRTUAL_ENV="$NVIM_VENV" uv pip install pynvim black isort
+# Neovim python environment, nvim/lua/config/lsp.lua expects it in $DOTFILES_PATH/.venv
+NVIM_VENV="$DOTFILES_DIR/.venv"
+uv venv --allow-existing --python "$NVIM_PYTHON_VERSION" "$NVIM_VENV"
+VIRTUAL_ENV="$NVIM_VENV" uv pip install pynvim black isort pyright
 
 # Python-based CLI tools, installed as isolated executables
 uv tool install pyright

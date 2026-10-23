@@ -1,5 +1,5 @@
 {
-  description = "NixOS VM for UTM, and a common dev shell";
+  description = "NixOS VM for UTM, home-manager for other Linux, and a common dev shell";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -31,11 +31,22 @@
               useGlobalPkgs = true;
               useUserPackages = true;
               backupFileExtension = "bak";
-              users.goncalo = ./home.nix;
+              users.goncalo.imports = [ ./home.nix ./home-utm.nix ];
             };
           }
         ];
       };
+
+      # home-manager switch --flake ~/dotfiles/nix#goncalo-$(uname -m) (non-NixOS Linux)
+      homeConfigurations = nixpkgs.lib.listToAttrs (map
+        (arch: {
+          name = "goncalo-${arch}";
+          value = home-manager.lib.homeManagerConfiguration {
+            pkgs = nixpkgs.legacyPackages."${arch}-linux";
+            modules = [ ./home.nix ./home-linux.nix ];
+          };
+        })
+        [ "x86_64" "aarch64" ]);
 
       # Run from the NixOS live ISO, see README.md
       apps.aarch64-linux.install =
