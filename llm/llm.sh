@@ -41,6 +41,12 @@ function pi() {
 }
 
 
+# Claude sandbox
+function claude() {
+    sbx run claude "$@"
+}
+
+
 # ... more harnesses here
 
 

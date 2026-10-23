@@ -7,7 +7,7 @@ This repository contains my development setup accross platforms.
 MacOS setup does not use nix since it's not so important to have strict
 reproducability. The script installs the following packages: `neovim`, `bash`,
 `kitty`, `tree-sitter`, `lazygit`, `fzf`, `fd`, `ripgrep`, `uv`, `node`,
-`btop`, `coreutils`, `sbx`, and `Karabiner-Elements`. 
+`btop`, `coreutils`, `sbx`, `vorssaint`, and `Karabiner-Elements`. 
 It also sets up the neovim python environment, links dotfiles, and configures
 shell profiles.
 
