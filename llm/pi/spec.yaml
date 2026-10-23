@@ -1,3 +1,7 @@
+# The kit spec has no way to exclude files from the workspace mount.
+# llm.sh stashes gitignored files (e.g. decrypted/ secrets) out of the
+# workspace before launching and restores them on exit — see llm/README.md.
+
 schemaVersion: "2"
 kind: sandbox
 name: pi

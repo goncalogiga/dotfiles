@@ -53,3 +53,26 @@ vibetree --harness pi "my feature"  # new worktree (pi)
 ```
 
 Worktrees are stored in `~/.vibetrees/<repo>/`.
+
+## Gitignored files and secrets
+
+Sandboxes bind-mount the workspace, so everything in it — including
+gitignored files — is readable by the agent. Before launching, `llm.sh`
+moves gitignored files (e.g. `decrypted/` secrets, `.venv/`) out of the
+workspace into `~/.vibetrees/stash/<id>/` and restores them when the
+sandbox exits. Nothing is deleted; a leftover stash from a killed shell
+is recovered automatically on the next launch.
+
+* Set `SBX_STASH_IGNORED=0` to disable.
+* Set `SBX_STASH_ROOT` to change the stash location (must be outside the
+  workspace).
+
+Caveats:
+
+* The `.git` directory is still mounted: anything ever committed is
+  readable, including history. Only commit encrypted secrets.
+* SSH agent forwarding is enabled by default in Docker Sandboxes: the
+  agent can use your host SSH keys even though the key files are stashed.
+  Unset `SSH_AUTH_SOCK` before launching to disable it.
+* The `MISTRAL_API_KEY` is injected by the sbx proxy and is never visible
+  inside the sandbox.
