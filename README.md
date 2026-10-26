@@ -53,13 +53,15 @@ bash scripts/macos-setup.sh
 - [ ] UTM
 - [ ] Docker
 - [ ] Spotify
+- [ ] Anki
 
 Other stuff for personnal use:
 
-- [ ] Tailscale (Personnal)
-- [ ] ProtonVPN (Personnal)
-- [ ] Whatsapp, Signal, Slack (Personnal)
-- [ ] Numbers (Personnal)
+- [ ] Tailscale 
+- [ ] ProtonVPN 
+- [ ] Whatsapp, Signal, Slack 
+- [ ] Numbers 
+- [ ] IINA 
 
 
 ## NixOS VM on macOS
