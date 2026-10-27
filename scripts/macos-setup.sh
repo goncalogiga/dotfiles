@@ -4,6 +4,8 @@ set -euo pipefail
 NVIM_PYTHON_VERSION=3.14
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+source "$DOTFILES_DIR/scripts/utils.sh"
+
 if ! command -v brew >/dev/null; then
     echo "Error: Homebrew is required. Install it from https://brew.sh" >&2
     exit 1
@@ -55,6 +57,14 @@ fi
 # Install node and npm if missing
 if ! command -v node >/dev/null; then
     brew install node
+fi
+
+# Install the Rust toolchain if missing
+if ! command -v rustup >/dev/null && [ ! -x "$HOME/.cargo/bin/rustup" ]; then
+    curl_sh https://sh.rustup.rs -y || true
+fi
+if [ -x "$HOME/.cargo/bin/rustup" ]; then
+    "$HOME/.cargo/bin/rustup" component add rust-analyzer rustfmt clippy
 fi
 
 # Install btop if missing

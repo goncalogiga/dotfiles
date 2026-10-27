@@ -34,10 +34,10 @@ reproducability. The script installs the following packages: `neovim`, `bash`,
 `kitty`, `tree-sitter`, `lazygit`, `fzf`, `fd`, `ripgrep`, `uv`, `node`,
 `btop`, `coreutils`, `sbx`, `vorssaint`, and `Karabiner-Elements`. 
 
-It also sets up the neovim python environment, links dotfiles, configures
-shell profiles, sets the Dock to auto-hide and only show running apps, and
-hides desktop icons (see [scripts/macos-setup.sh](scripts/macos-setup.sh) to
-revert).
+It also installs the Rust toolchain through `rustup`, sets up the neovim python
+environment, links dotfiles, configures shell profiles, sets the Dock to
+auto-hide and only show running apps, and hides desktop icons (see
+[scripts/macos-setup.sh](scripts/macos-setup.sh) to revert).
 
 We can setup the base neovim development environment with : 
 

@@ -53,6 +53,16 @@ vim.api.nvim_create_autocmd('LspAttach', {
         vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
         vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
         vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
+
+        -- Inline type hints (e.g. `let x: Vec<String>`), toggled with <leader>vh
+        local client = vim.lsp.get_client_by_id(args.data.client_id)
+        if client and client:supports_method('textDocument/inlayHint') then
+            vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
+            vim.keymap.set("n", "<leader>vh", function()
+                local enabled = vim.lsp.inlay_hint.is_enabled({ bufnr = args.buf })
+                vim.lsp.inlay_hint.enable(not enabled, { bufnr = args.buf })
+            end, opts)
+        end
     end,
 })
 
@@ -98,3 +108,28 @@ vim.lsp.config('pyright', {
     },
 })
 vim.lsp.enable("pyright")
+
+
+-- Setting up rust-analyzer --
+-- Installed through rustup (`rustup component add rust-analyzer`), so it's on PATH.
+vim.lsp.config('rust_analyzer', {
+    cmd = { 'rust-analyzer' },
+    filetypes = { 'rust' },
+    root_markers = { 'Cargo.toml', '.git' },
+    settings = {
+        ['rust-analyzer'] = {
+            -- clippy lints on save instead of plain `cargo check`
+            check = { command = 'clippy' },
+        },
+    },
+})
+vim.lsp.enable('rust_analyzer')
+
+-- rustfmt on save, through rust-analyzer
+vim.api.nvim_create_autocmd('BufWritePre', {
+    group = vim.api.nvim_create_augroup('RustFormat', { clear = true }),
+    pattern = '*.rs',
+    callback = function(args)
+        vim.lsp.buf.format({ bufnr = args.buf, name = 'rust_analyzer' })
+    end,
+})

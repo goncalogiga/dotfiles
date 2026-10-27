@@ -26,6 +26,10 @@ pkgs: with pkgs; [
 
   # Rust
   cargo
+  rustc
+  rust-analyzer # LSP for neovim
+  rustfmt
+  clippy
 
   # Build tools
   gcc
